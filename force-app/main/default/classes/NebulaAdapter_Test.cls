@@ -1,18 +1,17 @@
 @IsTest
 private class NebulaAdapter_Test {
-    // Simple mock that captures the last request so we can assert on it.
-    private class DummyHttpMock implements HttpCalloutMock {
-        static HttpRequest lastRequest;
+    // Mock that extends HttpCalloutMockFactory to capture the last request for assertions
+    public class RequestCapturingMock extends HttpCalloutMockFactory {
+        public static HttpRequest lastRequest;
 
-        public HTTPResponse respond(HTTPRequest req) {
+        @SuppressWarnings('PMD.ExcessiveParameterList')
+        public RequestCapturingMock(Integer code, String status, String bodyAsString, Map<String, String> headers) {
+            super(code, status, bodyAsString, headers);
+        }
+
+        public override HttpResponse respond(HttpRequest req) {
             lastRequest = req;
-
-            HttpResponse res = new HttpResponse();
-            res.setStatusCode(200);
-            res.setStatus('OK');
-            res.setBody('{"ok":true}');
-            res.setHeader('Content-Type', 'application/json');
-            return res;
+            return super.respond(req);
         }
     }
 
@@ -26,20 +25,26 @@ private class NebulaAdapter_Test {
     @IsTest
     static void testPostRequestNoNebulaPresent() {
         // Arrange
-        Test.setMock(HttpCalloutMock.class, new DummyHttpMock());
+        RequestCapturingMock mock = new RequestCapturingMock(
+            200,
+            'OK',
+            '{"ok":true}',
+            new Map<String, String>{'Content-Type' => 'application/json'}
+        );
+        Test.setMock(HttpCalloutMock.class, mock);
         Account a = makeAccount();
 
         // Build the api call
-        RestLibApiCall call = new RestLibApiCall();
-        call.method = HttpVerb.POST;
-        call.path = '/v1/foo';
-        call.encodedQuery = '?x=1';
-        call.hasBody = true;
-        call.body = '{"hello":"world"}';
-        call.functionalHeaders = new Map<String, String>{
-            'Content-Type' => 'application/json',
-            'X-Custom'     => 'abc123'
-        };
+        RestLibApiCall call = new RestLibApiCall(
+            HttpVerb.POST,
+            '/v1/foo',
+            '?x=1',
+            '{"hello":"world"}',
+            new Map<String, String>{
+                'Content-Type' => 'application/json',
+                'X-Custom'     => 'abc123'
+            }
+        );
 
         // Create your service instance
         RestClientLib svc = new RestClientLib('My_NC');
@@ -50,19 +55,19 @@ private class NebulaAdapter_Test {
 
         // Assert — response
         System.assertEquals(200, res.getStatusCode(), 'Should get 200 OK');
-        System.assert(res.getBody().contains('"ok":true'));
+        System.assert(res.getBody().contains('"ok":true'), 'Response body should contain ok:true');
 
         // Assert — request captured by mock
-        System.assertEquals('POST', DummyHttpMock.lastRequest.getMethod());
-        System.assert(DummyHttpMock.lastRequest.getEndpoint().startsWith('callout:'),
+        System.assertEquals('POST', RequestCapturingMock.lastRequest.getMethod(), 'Should use POST method');
+        System.assert(RequestCapturingMock.lastRequest.getEndpoint().startsWith('callout:'),
                       'Endpoint should use callout:NamedCredential...');
-        System.assertEquals('{"hello":"world"}', DummyHttpMock.lastRequest.getBody());
-        System.assertEquals('application/json', DummyHttpMock.lastRequest.getHeader('Content-Type'));
-        System.assertEquals('abc123', DummyHttpMock.lastRequest.getHeader('X-Custom'));
+        System.assertEquals('{"hello":"world"}', RequestCapturingMock.lastRequest.getBody(), 'Should have correct body');
+        System.assertEquals('application/json', RequestCapturingMock.lastRequest.getHeader('Content-Type'), 'Should have correct Content-Type');
+        System.assertEquals('abc123', RequestCapturingMock.lastRequest.getHeader('X-Custom'), 'Should have correct X-Custom header');
 
         // Nebula adapter should safely no-op (no exception thrown)
         NebulaAdapter.info('Just a test log', a);
-        NebulaAdapter.logHttpRequest('Req', DummyHttpMock.lastRequest, new List<String>{'X-Custom'}, a);
+        NebulaAdapter.logHttpRequest('Req', RequestCapturingMock.lastRequest, new List<String>{'X-Custom'}, a);
         NebulaAdapter.logHttpResponse('Res', res, a);
         // If Nebula isn't installed, the above calls should silently do nothing.
     }
@@ -70,17 +75,24 @@ private class NebulaAdapter_Test {
     @IsTest
     static void testDeleteRequestNoBodyNoNebulaPresent() {
         // Arrange
-        Test.setMock(HttpCalloutMock.class, new DummyHttpMock());
+        RequestCapturingMock mock = new RequestCapturingMock(
+            200,
+            'OK',
+            '{"ok":true}',
+            new Map<String, String>{'Content-Type' => 'application/json'}
+        );
+        Test.setMock(HttpCalloutMock.class, mock);
         Account a = makeAccount();
 
-        RestLibApiCall call = new RestLibApiCall();
-        call.method = HttpVerb.DEL; // your code maps DEL -> 'DELETE'
-        call.path = '/v1/resource/123';
-        call.encodedQuery = '';
-        call.hasBody = false;
-        call.functionalHeaders = new Map<String, String>{
-            'Accept' => 'application/json'
-        };
+        RestLibApiCall call = new RestLibApiCall(
+            HttpVerb.DEL, // your code maps DEL -> 'DELETE'
+            '/v1/resource/123',
+            '',
+            '',
+            new Map<String, String>{
+                'Accept' => 'application/json'
+            }
+        );
 
         RestClientLib svc = new RestClientLib('My_NC');
 
@@ -89,12 +101,12 @@ private class NebulaAdapter_Test {
         Test.stopTest();
 
         // Assert — response
-        System.assertEquals(200, res.getStatusCode());
+        System.assertEquals(200, res.getStatusCode(), 'Should get 200 OK');
 
         // Assert — request
-        System.assertEquals('DELETE', DummyHttpMock.lastRequest.getMethod(), 'DEL should map to DELETE');
-        System.assertEquals('application/json', DummyHttpMock.lastRequest.getHeader('Accept'));
-        System.assertEquals(null, DummyHttpMock.lastRequest.getBody(), 'DELETE should not have a body by default');
+        System.assertEquals('DELETE', RequestCapturingMock.lastRequest.getMethod(), 'DEL should map to DELETE');
+        System.assertEquals('application/json', RequestCapturingMock.lastRequest.getHeader('Accept'), 'Should have correct Accept header');
+        System.assertEquals(null, RequestCapturingMock.lastRequest.getBody(), 'DELETE should not have a body by default');
 
         // Nebula adapter no-ops again
         NebulaAdapter.debug('Another test log', a);
