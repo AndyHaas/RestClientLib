@@ -152,18 +152,37 @@ jobs:
       id: package_version
       env:
         SF_PACKAGE1_ID: ${{ vars.SF_PACKAGE1_ID }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         # Check if package ID exists, if not create a new package
         if [ -z "$SF_PACKAGE1_ID" ] || [ "$SF_PACKAGE1_ID" = "NULL" ] || [ "$SF_PACKAGE1_ID" = "null" ] || [ "$SF_PACKAGE1_ID" = "" ]; then
           echo "No package ID found, creating new package..."
           
-          # Create a new package
+          # Debug: Check authentication and org status
+          echo "Checking authentication..."
+          sf org list || echo "No orgs found"
+          
+          # Debug: Check if we're in the right org
+          echo "Current org info:"
+          sf org display || echo "No org display available"
+          
+          # Debug: Try a simple command first
+          echo "Testing basic sf command..."
+          sf --version || echo "SF CLI not working"
+          
+          # Create a new package with more debugging
+          echo "Creating package with command:"
+          echo "sf package create --name 'REST API Library' --description 'A comprehensive Salesforce Apex library for making REST API callouts' --package-type Unlocked --path force-app --target-dev-hub pkgorg --json"
+          
           PACKAGE_OUTPUT=$(sf package create \
             --name "REST API Library" \
             --description "A comprehensive Salesforce Apex library for making REST API callouts" \
             --package-type Unlocked \
+            --path force-app \
+            --target-dev-hub pkgorg \
             --json 2>&1)
           
+          echo "Package create exit code: $?"
           echo "Package create output:"
           echo "$PACKAGE_OUTPUT"
           
@@ -172,12 +191,15 @@ jobs:
           
           if [ "$PACKAGE_ID" != "null" ] && [ -n "$PACKAGE_ID" ]; then
             echo "✅ Created new package with ID: $PACKAGE_ID"
-            echo ""
-            echo "🔧 IMPORTANT: Please update your GitHub repository variable:"
-            echo "   Variable Name: SF_PACKAGE1_ID"
-            echo "   Variable Value: $PACKAGE_ID"
-            echo "   Go to: Settings > Secrets and variables > Actions > Variables"
-            echo ""
+            
+            # Update GitHub repository variable automatically
+            echo "Updating GitHub repository variable..."
+            curl -X PATCH \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/variables/SF_PACKAGE1_ID" \
+              -d "{\"name\":\"SF_PACKAGE1_ID\",\"value\":\"$PACKAGE_ID\"}" && echo "✅ GitHub variable updated successfully" || echo "⚠️ Failed to update GitHub variable (you can update manually)"
             
             # Set the package ID for this run
             SF_PACKAGE1_ID="$PACKAGE_ID"
