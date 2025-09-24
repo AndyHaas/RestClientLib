@@ -98,6 +98,11 @@ public with sharing class RestLibApiCall {
 			timeoutValue = value;
 		}
 	}
+	
+	/**
+	 * @description tracks if this was originally a PATCH method
+	 */
+	private Boolean wasPatchMethod = false;
 	/**
 	 * @description body the string encoded body to be included in the request
 	 */
@@ -165,6 +170,7 @@ public with sharing class RestLibApiCall {
 		if (method == HttpVerb.PATCH) {
 			// Handle PATCH as POST with custom parameter
 			this.methodValue = HttpVerb.POST;
+			this.wasPatchMethod = true;
 			if (this.encodedQueryValue == null) {
 				this.encodedQueryValue = '?_HttpMethod=PATCH';
 			} else {
@@ -244,6 +250,16 @@ public with sharing class RestLibApiCall {
 		} else {
 			this.encodedQueryValue = null;
 		}
+		
+		// If this was originally a PATCH method, add the PATCH parameter
+		if (this.wasPatchMethod) {
+			if (this.encodedQueryValue == null) {
+				this.encodedQueryValue = '?_HttpMethod=PATCH';
+			} else {
+				this.encodedQueryValue += '&_HttpMethod=PATCH';
+			}
+		}
+		
 		return this;
 	}
 
@@ -317,6 +333,7 @@ public with sharing class RestLibApiCall {
 		this.encodedQueryValue = String.isNotBlank(query) ? EncodingUtil.urlEncode(query, 'UTF-8') : null;
 		if (method == HttpVerb.PATCH) {
 			this.methodValue = HttpVerb.POST;
+			this.wasPatchMethod = true;
 			if (this.encodedQueryValue == null) {
 				this.encodedQueryValue = '?_HttpMethod=PATCH';
 			} else {
