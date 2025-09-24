@@ -1,5 +1,11 @@
 @isTest
 private class RestLibTests {
+	// Helper to create a minimal related record for logging.
+	private static Account makeAccount() {
+		Account a = new Account(Name = 'Test Acct');
+		insert a;
+		return a;
+	}
 	/**
 	 * @description Executes a positive test case of the Constructor.
 	 * Expects the named credential to be set.
