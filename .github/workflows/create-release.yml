@@ -143,9 +143,133 @@ jobs:
       run: |
         sf project convert source --root-dir force-app --output-dir mdapi_out
     
+    - name: Run tests and check code coverage
+      run: |
+        echo "Running tests for package-specific test classes: NebulaAdapter_Test, RestLibTests"
+        
+        # Run only the test classes that are part of this package
+        set +e  # Don't exit on error, we'll handle it manually
+        sf apex test run --class-names NebulaAdapter_Test,RestLibTests --target-org pkgorg --result-format json --code-coverage --wait 10 > test_result.json 2>&1
+        TEST_EXIT_CODE=$?
+        set -e  # Re-enable exit on error
+        
+        echo "Test execution exit code: $TEST_EXIT_CODE"
+        echo "Test execution output:"
+        # Read from file to avoid broken pipe issues
+        cat test_result.json
+        
+        # Check if test execution was successful
+        if [ $TEST_EXIT_CODE -ne 0 ]; then
+          echo "❌ ERROR: Test execution failed with exit code $TEST_EXIT_CODE"
+          echo "Raw output:"
+          cat test_result.json
+          exit 1
+        fi
+        
+        # Check if we have valid JSON output
+        if ! jq -e '.result' test_result.json > /dev/null 2>&1; then
+          echo "❌ ERROR: Invalid test result format"
+          echo "Raw output:"
+          cat test_result.json
+          exit 1
+        fi
+        
+        # Extract test summary
+        if jq -e '.result.summary' test_result.json > /dev/null 2>&1; then
+          SUMMARY=$(jq -r '.result.summary' test_result.json)
+          echo "Test Summary: $SUMMARY"
+          
+          # Show detailed test counts
+          PASSING=$(jq -r '.result.summary.passing // 0' test_result.json)
+          FAILING=$(jq -r '.result.summary.failing // 0' test_result.json)
+          SKIPPED=$(jq -r '.result.summary.skipped // 0' test_result.json)
+          TESTS_RAN=$(jq -r '.result.summary.testsRan // 0' test_result.json)
+          
+          echo "📈 Test Results: $PASSING passed, $FAILING failed, $SKIPPED skipped (Total: $TESTS_RAN)"
+        fi
+        
+        # Extract coverage percentage - try multiple possible locations in the JSON
+        COVERAGE=""
+        if jq -e '.result.summary.testRunCoverage' test_result.json > /dev/null 2>&1; then
+          COVERAGE=$(jq -r '.result.summary.testRunCoverage' test_result.json | sed 's/%//')
+          echo "Code coverage (test run): $COVERAGE%"
+        elif jq -e '.result.coverage.coverage' test_result.json > /dev/null 2>&1; then
+          COVERAGE=$(jq -r '.result.coverage.coverage[].percent' test_result.json)
+          echo "Code coverage (per class): $COVERAGE%"
+        else
+          echo "⚠️ WARNING: Could not extract coverage information from test results"
+        fi
+        
+        # Check if coverage meets minimum requirement (75%)
+        if [ -n "$COVERAGE" ]; then
+          MIN_COVERAGE=75
+          if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
+            echo ""
+            echo "❌ COVERAGE FAILURE: Code coverage $COVERAGE% is below minimum requirement of $MIN_COVERAGE%"
+            echo ""
+            echo "📊 COVERAGE ANALYSIS:"
+            echo "  Current Coverage: $COVERAGE%"
+            echo "  Required Coverage: $MIN_COVERAGE%"
+            echo "  Coverage Gap: $((MIN_COVERAGE - COVERAGE))%"
+            echo ""
+            echo "🔍 TEST CLASSES BEING VALIDATED:"
+            echo "  - NebulaAdapter_Test"
+            echo "  - RestLibTests"
+            echo ""
+            echo "💡 TO FIX THIS ISSUE:"
+            echo "  1. Add more test methods to cover uncovered code paths"
+            echo "  2. Improve existing test methods to cover more scenarios"
+            echo "  3. Review uncovered lines in the test results above"
+            echo "  4. Ensure all public methods and critical code paths are tested"
+            echo ""
+            echo "📋 NEXT STEPS:"
+            echo "  - Check the detailed coverage information in the test output above"
+            echo "  - Look for 'uncoveredLines' in the JSON output to see which lines need testing"
+            echo "  - Add test methods for any missing scenarios"
+            echo "  - Re-run the workflow after improving test coverage"
+            echo ""
+            exit 1
+          else
+            echo "✅ SUCCESS: Code coverage $COVERAGE% meets minimum requirement of $MIN_COVERAGE%"
+          fi
+        fi
+        
+        # Check for test failures
+        if jq -e '.result.failures' test_result.json > /dev/null 2>&1; then
+          FAILURES=$(jq -r '.result.failures' test_result.json)
+          if [ "$FAILURES" != "0" ] && [ "$FAILURES" != "null" ]; then
+            echo "❌ ERROR: $FAILURES test(s) failed"
+            echo "Test failures details:"
+            jq -r '.result.tests[] | select(.Outcome == "Fail") | "  - \(.MethodName): \(.Message)"' test_result.json 2>/dev/null || echo "Could not extract failure details"
+            exit 1
+          fi
+        fi
+        
+        # Clean up temporary test result file
+        rm -f test_result.json
+
     - name: Deploy to packaging org
       run: |
-        sf project deploy start --metadata-dir mdapi_out --target-org pkgorg --wait 60 --ignore-conflicts
+        echo "Deploying converted metadata to packaging org..."
+        echo "Source directory: mdapi_out"
+        echo "Target org: pkgorg"
+        
+        set +e  # Don't exit on error, we'll handle it manually
+        DEPLOY_OUTPUT=$(sf project deploy start --metadata-dir mdapi_out --target-org pkgorg --wait 60 --ignore-conflicts 2>&1)
+        DEPLOY_EXIT_CODE=$?
+        set -e  # Re-enable exit on error
+        
+        echo "Deploy exit code: $DEPLOY_EXIT_CODE"
+        echo "Deploy output:"
+        echo "$DEPLOY_OUTPUT"
+        
+        if [ $DEPLOY_EXIT_CODE -eq 0 ]; then
+          echo "✅ Successfully deployed to packaging org"
+        else
+          echo "❌ ERROR: Deployment failed with exit code $DEPLOY_EXIT_CODE"
+          echo "💡 Check the output above for specific error details"
+          exit 1
+        fi
     
     - name: Create package and version
       id: package_version
@@ -215,19 +339,23 @@ jobs:
         echo "Creating package version for package: $SF_PACKAGE1_ID"
         echo "Command: sf package version create --package '$SF_PACKAGE1_ID' --installation-key-bypass --wait 10 --target-dev-hub pkgorg --json"
         
+        # Run the command and capture both output and exit code
+        set +e  # Don't exit on error, we'll handle it manually
         PACKAGE_VERSION_OUTPUT=$(sf package version create \
           --package "$SF_PACKAGE1_ID" \
           --installation-key-bypass \
           --wait 10 \
           --target-dev-hub pkgorg \
           --json 2>&1)
+        PACKAGE_VERSION_EXIT_CODE=$?
+        set -e  # Re-enable exit on error
         
-        echo "Package version create exit code: $?"
+        echo "Package version create exit code: $PACKAGE_VERSION_EXIT_CODE"
         echo "Package version create output:"
         echo "$PACKAGE_VERSION_OUTPUT"
         
         # Check if the command was successful
-        if echo "$PACKAGE_VERSION_OUTPUT" | jq -e '.result.SubscriberPackageVersionId' > /dev/null 2>&1; then
+        if [ $PACKAGE_VERSION_EXIT_CODE -eq 0 ] && echo "$PACKAGE_VERSION_OUTPUT" | jq -e '.result.SubscriberPackageVersionId' > /dev/null 2>&1; then
           # Extract the package version ID and create installation URLs
           PACKAGE_VERSION_ID=$(echo "$PACKAGE_VERSION_OUTPUT" | jq -r '.result.SubscriberPackageVersionId')
           PRODUCTION_URL="https://login.salesforce.com/packaging/installPackage.apexp?p0=$PACKAGE_VERSION_ID"
@@ -238,12 +366,38 @@ jobs:
           echo "sandbox_url=$SANDBOX_URL" >> $GITHUB_OUTPUT
           echo "package_id=$SF_PACKAGE1_ID" >> $GITHUB_OUTPUT
           
-          echo "Created package version: $PACKAGE_VERSION_ID"
+          echo "✅ Created package version: $PACKAGE_VERSION_ID"
           echo "Production URL: $PRODUCTION_URL"
           echo "Sandbox URL: $SANDBOX_URL"
         else
-          echo "ERROR: Failed to create package version"
+          echo "❌ ERROR: Failed to create package version"
+          echo "Exit code: $PACKAGE_VERSION_EXIT_CODE"
           echo "Full output: $PACKAGE_VERSION_OUTPUT"
+          
+          # Try to extract error details from JSON output
+          if echo "$PACKAGE_VERSION_OUTPUT" | jq -e '.message' > /dev/null 2>&1; then
+            ERROR_MESSAGE=$(echo "$PACKAGE_VERSION_OUTPUT" | jq -r '.message')
+            echo "Error message: $ERROR_MESSAGE"
+          fi
+          
+          if echo "$PACKAGE_VERSION_OUTPUT" | jq -e '.result[0].error' > /dev/null 2>&1; then
+            ERROR_DETAILS=$(echo "$PACKAGE_VERSION_OUTPUT" | jq -r '.result[0].error')
+            echo "Error details: $ERROR_DETAILS"
+          fi
+          
+          # Check for common issues
+          if echo "$PACKAGE_VERSION_OUTPUT" | grep -i "permission" > /dev/null; then
+            echo "💡 Possible permission issue - check if the user has Package Creation permissions"
+          fi
+          
+          if echo "$PACKAGE_VERSION_OUTPUT" | grep -i "validation" > /dev/null; then
+            echo "💡 Possible validation error - check if all metadata is valid"
+          fi
+          
+          if echo "$PACKAGE_VERSION_OUTPUT" | grep -i "coverage" > /dev/null; then
+            echo "💡 Possible code coverage issue - ensure all code has adequate test coverage"
+          fi
+          
           exit 1
         fi
     
