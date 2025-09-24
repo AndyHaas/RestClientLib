@@ -337,7 +337,7 @@ jobs:
           echo "**Package:** [$PACKAGE_FILE](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/$PACKAGE_FILE)  "
           echo "**Release Date:** $(date -u +"%Y-%m-%d")  "
           echo ""
-          echo "### 🚀 Quick Install"
+          echo "### Quick Install"
           echo "- **Production:** [${{ steps.package_version.outputs.production_url }}](${{ steps.package_version.outputs.production_url }})"
           echo "- **Sandbox:** [${{ steps.package_version.outputs.sandbox_url }}](${{ steps.package_version.outputs.sandbox_url }})"
           echo "- **CLI:** \`sf package install --package ${{ steps.package_version.outputs.package_version_id }} --wait 10 --installation-key-bypass\`"
@@ -382,14 +382,14 @@ jobs:
 
     - name: Summary
       run: |
-        echo "## 🔨 Build Completed Successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "## Build Completed Successfully!" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Version:** ${{ steps.version.outputs.new }}" >> $GITHUB_STEP_SUMMARY
         echo "**Previous Version:** ${{ steps.version.outputs.current }}" >> $GITHUB_STEP_SUMMARY
         echo "**Release Type:** ${{ steps.version.outputs.release_type }}" >> $GITHUB_STEP_SUMMARY
         echo "**Bump Type:** ${{ github.event.inputs.bump }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📦 Artifacts Created" >> $GITHUB_STEP_SUMMARY
+        echo "### Artifacts Created" >> $GITHUB_STEP_SUMMARY
         echo "- Package zip file" >> $GITHUB_STEP_SUMMARY
         echo "- Salesforce package version: ${{ steps.package_version.outputs.package_version_id }}" >> $GITHUB_STEP_SUMMARY
         echo "- Production URL: ${{ steps.package_version.outputs.production_url }}" >> $GITHUB_STEP_SUMMARY
@@ -397,6 +397,6 @@ jobs:
         echo "- Release notes" >> $GITHUB_STEP_SUMMARY
         echo "- Version file" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 🔄 Next Steps" >> $GITHUB_STEP_SUMMARY
-        echo "✅ GitHub release created and README updated automatically!" >> $GITHUB_STEP_SUMMARY
-        echo "✅ Package version created and ready for installation!" >> $GITHUB_STEP_SUMMARY
+        echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+        echo "- GitHub release created and README updated automatically!" >> $GITHUB_STEP_SUMMARY
+        echo "- Package version created and ready for installation!" >> $GITHUB_STEP_SUMMARY
