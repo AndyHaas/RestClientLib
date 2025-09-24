@@ -9,7 +9,7 @@ A comprehensive Salesforce Apex library that provides a clean, type-safe, and ex
 **Release Type:** stable  
 **Package Version ID:** 04tQm000002z5mPIAQ  
 **Package:** [REST-API-Library-v1.0.4.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.4/REST-API-Library-v1.0.4.zip)  
-**Release Date:** 2025-01-24  
+**Release Date:** 2025-10-24
 
 ### Quick Install
 - **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ)
