@@ -36,12 +36,13 @@ public with sharing virtual class RestLib {
 	 * as convenient, syntactic sugar on this method.
 	 *
 	 * @param apiCall The RestLibApiCall object containing all the information needed to make the callout
+	 * @param relatedRecord The SObject record to associate with the API call for logging purposes
 	 *
 	 * @return HttpResponse  HttpResponse Obj
 	 */
 	@TestVisible
 	@SuppressWarnings('PMD.ExcessiveParameterList')
-	protected HttpResponse makeApiCall(RestLibApiCall apiCall) {
+	protected HttpResponse makeApiCall(RestLibApiCall apiCall, SObject relatedRecord) {
 		HttpRequest apiRequest = new HttpRequest();
 		if (apiCall.method == HttpVerb.DEL) {
 			apiRequest.setMethod('DELETE');
@@ -60,7 +61,47 @@ public with sharing virtual class RestLib {
 				apiCall.path +
 				apiCall.encodedQuery
 		);
+
+		// --- Nebula (optional) request log
+		NebulaAdapter.logHttpRequest(
+			'API Request - ' + apiCall.path,
+			apiRequest,
+			new List<String>(apiCall.functionalHeaders.keySet()),
+			relatedRecord
+		);
+
 		Http http = new Http();
-		return http.send(apiRequest);
+		HttpResponse result = http.send(apiRequest);
+
+		// --- Nebula (optional) response log
+		NebulaAdapter.logHttpResponse(
+			'API Response - ' + apiCall.path,
+			result,
+			relatedRecord
+		);
+
+		// If you want to persist immediately (instead of batching):
+		if (NebulaAdapter.isAvailable()) {
+			// Use Callable action 'saveLog'
+			// (Adapter's log() leaves persistence up to you.)
+			NebulaAdapter.save();
+		}
+
+		return result;
+	}
+
+	/**
+	 * @description Omnibus callout method. This is the primary method for
+	 * making a REST callout. Most of the other methods in this class serve
+	 * as convenient, syntactic sugar on this method.
+	 *
+	 * @param apiCall The RestLibApiCall object containing all the information needed to make the callout
+	 *
+	 * @return HttpResponse  HttpResponse Obj
+	 */
+	@TestVisible
+	@SuppressWarnings('PMD.ExcessiveParameterList')
+	protected HttpResponse makeApiCall(RestLibApiCall apiCall) {
+		return makeApiCall(apiCall, null);
 	}
 }

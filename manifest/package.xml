@@ -5,11 +5,13 @@
         <members>AsyncRestLibFinalizer</members>
         <members>HttpCalloutMockFactory</members>
         <members>HttpVerb</members>
+        <members>NebulaAdapter</members>
         <members>RestClient</members>
         <members>RestClientLib</members>
         <members>RestLib</members>
         <members>RestLibApiCall</members>
         <members>RestLibTests</members>
+        <members>NebulaAdapter_Test</members>
         <name>ApexClass</name>
     </types>
     <version>1.0</version>

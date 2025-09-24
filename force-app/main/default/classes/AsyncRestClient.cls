@@ -18,6 +18,11 @@ public with sharing class AsyncRestClient implements System.Queueable, Database.
 	private final Type handlerClass;
 
 	/**
+	 * @description The SObject record to associate with the API call for logging purposes
+	 */
+	private final SObject relatedRecord;
+
+	/**
 	 * @description Default constructor
 	 *
 	 * @param namedCredentialName String representing the named credential to use
@@ -32,6 +37,28 @@ public with sharing class AsyncRestClient implements System.Queueable, Database.
 		this.namedCredentialName = namedCredentialName;
 		this.apiCall = apiCall;
 		this.handlerClass = handlerClass;
+		this.relatedRecord = null;
+	}
+
+	/**
+	 * @description Constructor with logging context
+	 *
+	 * @param namedCredentialName String representing the named credential to use
+	 * @param apiCall RestLibApiCall The RestLibApiCall that describes your callout
+	 * @param handlerClass Type a type reference to the finalizer to be used.
+	 * @param relatedRecord The SObject record to associate with the API call for logging purposes
+	 */
+	@SuppressWarnings('PMD.ExcessiveParameterList')
+	public AsyncRestClient(
+		String namedCredentialName,
+		RestLibApiCall apiCall,
+		Type handlerClass,
+		SObject relatedRecord
+	) {
+		this.namedCredentialName = namedCredentialName;
+		this.apiCall = apiCall;
+		this.handlerClass = handlerClass;
+		this.relatedRecord = relatedRecord;
 	}
 
 	/**
@@ -44,7 +71,8 @@ public with sharing class AsyncRestClient implements System.Queueable, Database.
 		AsyncRestLibFinalizer theFinalizer = (AsyncRestLibFinalizer) handlerClass.newInstance();
 		theFinalizer.response = RestClient.makeApiCall(
 			this.namedCredentialName,
-			apiCall
+			apiCall,
+			this.relatedRecord
 		);
 		System.attachFinalizer(theFinalizer);
 	}
