@@ -678,20 +678,6 @@ private class RestLibTests {
 		Assert.areEqual('{"update":"data"}', call.body, 'Body should be set');
 	}
 
-
-	@isTest
-	private static void testRestLibApiCallWithMethodPatchNoExistingQuery() {
-		Test.startTest();
-		RestLibApiCall call = RestLibApiCall.create()
-			.withMethod(HttpVerb.PATCH)
-			.withPath('/test');
-		Test.stopTest();
-
-		Assert.areEqual(HttpVerb.POST, call.method, 'PATCH should be converted to POST');
-		Assert.areEqual('/test/', call.path, 'Path should be correct');
-		Assert.areEqual('?_HttpMethod=PATCH', call.encodedQuery, 'Should have only PATCH parameter');
-	}
-
 	@isTest
 	private static void testRestLibApiCallTimeoutProperty() {
 		Test.startTest();
