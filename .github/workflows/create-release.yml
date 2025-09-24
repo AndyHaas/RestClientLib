@@ -145,8 +145,8 @@ jobs:
     
     - name: Run tests and check code coverage
       run: |
-        # Run tests with JSON output for parsing
-        TEST_RESULT=$(sf apex test run --test-level RunLocalTests --target-org pkgorg --result-format json --code-coverage --wait 10)
+        # Run only the test classes that are part of this package
+        TEST_RESULT=$(sf apex test run --class-names NebulaAdapter_Test,RestLibTests --target-org pkgorg --result-format json --code-coverage --wait 10)
         echo "$TEST_RESULT" | jq '.'
         
         # Extract coverage percentage
