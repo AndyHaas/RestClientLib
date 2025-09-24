@@ -1,12 +1,6 @@
-name: Publish Release
+name: Post-Release Processing
 
 on:
-  workflow_dispatch:
-    inputs:
-      run_id:
-        description: 'Build & Bump run ID (optional - will use latest if not provided)'
-        required: false
-        type: string
   workflow_run:
     workflows: ["Build & Bump"]
     types: [completed]
@@ -17,33 +11,15 @@ permissions:
 
 jobs:
   publish:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install GitHub CLI (for manual runs)
-      if: ${{ github.event_name == 'workflow_dispatch' }}
-      run: |
-        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-        sudo apt update
-        sudo apt install gh -y
-
-    - name: Determine run ID
+    - name: Set run ID
       id: run_id
       run: |
-        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-          if [ -n "${{ github.event.inputs.run_id }}" ]; then
-            echo "run_id=${{ github.event.inputs.run_id }}" >> $GITHUB_OUTPUT
-          else
-            # Get the latest successful Build & Bump run
-            RUN_ID=$(gh run list --workflow="build-and-bump.yml" --status=success --limit=1 --json databaseId --jq '.[0].databaseId')
-            echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
-          fi
-        else
-          echo "run_id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
-        fi
-        echo "Using run ID: ${{ steps.run_id.outputs.run_id }}"
+        echo "run_id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
+        echo "Using run ID: ${{ github.event.workflow_run.id }}"
 
     - name: Download artifacts from Build & Bump run
       uses: actions/download-artifact@v4
@@ -59,9 +35,21 @@ jobs:
         ls -R artifacts
         VERSION=$(node -p "require('./artifacts/**/package.json').version" | head -1)
         TAG="v$VERSION"
+        
+        # Extract package version info from release notes if available
+        if [ -f "artifacts/**/release_notes.md" ]; then
+          PACKAGE_VERSION_ID=$(grep "Package Version ID:" artifacts/**/release_notes.md | sed 's/.*Package Version ID: //' | head -1)
+          PRODUCTION_URL=$(grep "Production:" artifacts/**/release_notes.md | sed 's/.*Production: \[.*\](\(.*\))/\1/' | head -1)
+          SANDBOX_URL=$(grep "Sandbox:" artifacts/**/release_notes.md | sed 's/.*Sandbox: \[.*\](\(.*\))/\1/' | head -1)
+        fi
+        
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "tag=$TAG" >> $GITHUB_OUTPUT
+        echo "package_version_id=$PACKAGE_VERSION_ID" >> $GITHUB_OUTPUT
+        echo "production_url=$PRODUCTION_URL" >> $GITHUB_OUTPUT
+        echo "sandbox_url=$SANDBOX_URL" >> $GITHUB_OUTPUT
         echo "Found version: $VERSION, tag: $TAG"
+        echo "Package Version ID: $PACKAGE_VERSION_ID"
 
     - name: Checkout repo (to update README)
       uses: actions/checkout@v4
@@ -77,9 +65,21 @@ jobs:
           echo "<!--LATEST-RELEASE-START-->"
           echo "**Version:** ${{ steps.meta.outputs.version }}  "
           echo "**Tag:** ${{ steps.meta.outputs.tag }}  "
+          if [ -n "${{ steps.meta.outputs.package_version_id }}" ]; then
+            echo "**Package Version ID:** ${{ steps.meta.outputs.package_version_id }}  "
+          fi
           echo "**Package:** [$PACKAGE_FILE](https://github.com/${{ github.repository }}/releases/download/${{ steps.meta.outputs.tag }}/$PACKAGE_FILE)  "
           echo "**Release Date:** $(date -u +"%Y-%m-%d")  "
           echo ""
+          if [ -n "${{ steps.meta.outputs.production_url }}" ] && [ -n "${{ steps.meta.outputs.sandbox_url }}" ]; then
+            echo "### 🚀 Quick Install"
+            echo "- **Production:** [${{ steps.meta.outputs.production_url }}](${{ steps.meta.outputs.production_url }}) - Install in production org"
+            echo "- **Sandbox:** [${{ steps.meta.outputs.sandbox_url }}](${{ steps.meta.outputs.sandbox_url }}) - Install in sandbox org"
+            if [ -n "${{ steps.meta.outputs.package_version_id }}" ]; then
+              echo "- **CLI:** \`sf package install --package ${{ steps.meta.outputs.package_version_id }} --wait 10 --installation-key-bypass\`"
+            fi
+            echo ""
+          fi
           echo "<details><summary>Change summary</summary>"
           echo ""
           # Skip first 5 lines (header) from notes if desired:
@@ -131,7 +131,7 @@ jobs:
 
     - name: Summary
       run: |
-        echo "## 🚀 Release Published Successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "## 🔄 Post-Release Processing Completed!" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Version:** ${{ steps.meta.outputs.version }}" >> $GITHUB_STEP_SUMMARY
         echo "**Tag:** ${{ steps.meta.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
@@ -144,3 +144,9 @@ jobs:
         echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
         echo "- [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ steps.meta.outputs.tag }})" >> $GITHUB_STEP_SUMMARY
         echo "- [Download Package](https://github.com/${{ github.repository }}/releases/download/${{ steps.meta.outputs.tag }}/REST-API-Library-v${{ steps.meta.outputs.version }}.zip)" >> $GITHUB_STEP_SUMMARY
+        if [ -n "${{ steps.meta.outputs.production_url }}" ]; then
+          echo "- [Install in Production](${{ steps.meta.outputs.production_url }})" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ -n "${{ steps.meta.outputs.sandbox_url }}" ]; then
+          echo "- [Install in Sandbox](${{ steps.meta.outputs.sandbox_url }})" >> $GITHUB_STEP_SUMMARY
+        fi

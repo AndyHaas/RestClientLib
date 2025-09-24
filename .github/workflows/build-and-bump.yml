@@ -12,10 +12,11 @@ on:
         description: 'Custom version (optional, overrides bump)'
         required: false
         type: string
-      create_release:
-        type: boolean
-        description: 'Create GitHub release after build'
-        default: false
+      release_type:
+        type: choice
+        description: 'Release type'
+        options: [stable, beta]
+        default: stable
 
 permissions:
   contents: write  # commit version bump + tag
@@ -82,11 +83,18 @@ jobs:
           NEW="$MAJOR.$MINOR.$PATCH"
         fi
         
+        # Add beta suffix if release type is beta
+        if [ "${{ github.event.inputs.release_type }}" == "beta" ]; then
+          NEW="${NEW}-beta"
+        fi
+        
         echo "current=$CUR" >> $GITHUB_OUTPUT
         echo "new=$NEW" >> $GITHUB_OUTPUT
         echo "tag=v$NEW" >> $GITHUB_OUTPUT
+        echo "release_type=${{ github.event.inputs.release_type }}" >> $GITHUB_OUTPUT
         echo "Current version: $CUR"
         echo "New version: $NEW"
+        echo "Release type: ${{ github.event.inputs.release_type }}"
     
     - name: Update package.json version
       run: |
@@ -140,6 +148,31 @@ jobs:
       run: |
         sf project deploy start --metadata-dir mdapi_out --target-org pkgorg --wait 60 --ignore-conflicts
     
+    - name: Create package version
+      id: package_version
+      env:
+        SF_PACKAGE1_ID: ${{ secrets.SF_PACKAGE1_ID }}
+      run: |
+        # Create a new package version
+        PACKAGE_VERSION_OUTPUT=$(sf package version create \
+          --package "$SF_PACKAGE1_ID" \
+          --installation-key-bypass \
+          --wait 10 \
+          --json)
+        
+        # Extract the package version ID and create installation URLs
+        PACKAGE_VERSION_ID=$(echo "$PACKAGE_VERSION_OUTPUT" | jq -r '.result.SubscriberPackageVersionId')
+        PRODUCTION_URL="https://login.salesforce.com/packaging/installPackage.apexp?p0=$PACKAGE_VERSION_ID"
+        SANDBOX_URL="https://test.salesforce.com/packaging/installPackage.apexp?p0=$PACKAGE_VERSION_ID"
+        
+        echo "package_version_id=$PACKAGE_VERSION_ID" >> $GITHUB_OUTPUT
+        echo "production_url=$PRODUCTION_URL" >> $GITHUB_OUTPUT
+        echo "sandbox_url=$SANDBOX_URL" >> $GITHUB_OUTPUT
+        
+        echo "Created package version: $PACKAGE_VERSION_ID"
+        echo "Production URL: $PRODUCTION_URL"
+        echo "Sandbox URL: $SANDBOX_URL"
+    
     - name: Build changelog
       run: |
         # Get previous tag
@@ -160,6 +193,13 @@ jobs:
           echo
           echo "**Package:** REST-API-Library-v${{ steps.version.outputs.new }}.zip"
           echo "**Previous Version:** ${{ steps.version.outputs.current }}"
+          echo "**Release Type:** ${{ steps.version.outputs.release_type }}"
+          echo "**Package Version ID:** ${{ steps.package_version.outputs.package_version_id }}"
+          echo
+          echo "### Installation"
+          echo "- **Production:** [${{ steps.package_version.outputs.production_url }}](${{ steps.package_version.outputs.production_url }})"
+          echo "- **Sandbox:** [${{ steps.package_version.outputs.sandbox_url }}](${{ steps.package_version.outputs.sandbox_url }})"
+          echo "- **CLI:** \`sf package install --package ${{ steps.package_version.outputs.package_version_id }} --wait 10 --installation-key-bypass\`"
           echo
           echo "### Changes"
           if [ -n "$PREV" ]; then
@@ -199,20 +239,18 @@ jobs:
           release_notes.md
         retention-days: 30
     
-    - name: Create GitHub Release (if requested)
-      if: ${{ github.event.inputs.create_release == 'true' }}
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.version.outputs.tag }}
-        name: REST API Library ${{ steps.version.outputs.tag }}
+        name: REST API Library ${{ steps.version.outputs.tag }} (${{ steps.version.outputs.release_type }})
         body_path: release_notes.md
         files: |
           REST-API-Library-v${{ steps.version.outputs.new }}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Update README with release info (if requested)
-      if: ${{ github.event.inputs.create_release == 'true' }}
+    - name: Update README with release info
       run: |
         PACKAGE_FILE="REST-API-Library-v${{ steps.version.outputs.new }}.zip"
         
@@ -220,8 +258,15 @@ jobs:
           echo "<!--LATEST-RELEASE-START-->"
           echo "**Version:** ${{ steps.version.outputs.new }}  "
           echo "**Tag:** ${{ steps.version.outputs.tag }}  "
+          echo "**Release Type:** ${{ steps.version.outputs.release_type }}  "
+          echo "**Package Version ID:** ${{ steps.package_version.outputs.package_version_id }}  "
           echo "**Package:** [$PACKAGE_FILE](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/$PACKAGE_FILE)  "
           echo "**Release Date:** $(date -u +"%Y-%m-%d")  "
+          echo ""
+          echo "### 🚀 Quick Install"
+          echo "- **Production:** [${{ steps.package_version.outputs.production_url }}](${{ steps.package_version.outputs.production_url }}) - Install in production org"
+          echo "- **Sandbox:** [${{ steps.package_version.outputs.sandbox_url }}](${{ steps.package_version.outputs.sandbox_url }}) - Install in sandbox org"
+          echo "- **CLI:** \`sf package install --package ${{ steps.package_version.outputs.package_version_id }} --wait 10 --installation-key-bypass\`"
           echo ""
           echo "<details><summary>Change summary</summary>"
           echo ""
@@ -243,8 +288,7 @@ jobs:
         rm latest_block.md
         echo "Updated README.md with latest release information"
 
-    - name: Commit README update (if requested)
-      if: ${{ github.event.inputs.create_release == 'true' }}
+    - name: Commit README update
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GIT_AUTHOR_NAME: github-actions
@@ -268,18 +312,17 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Version:** ${{ steps.version.outputs.new }}" >> $GITHUB_STEP_SUMMARY
         echo "**Previous Version:** ${{ steps.version.outputs.current }}" >> $GITHUB_STEP_SUMMARY
-        echo "**Release Type:** ${{ github.event.inputs.bump }}" >> $GITHUB_STEP_SUMMARY
-        echo "**Create Release:** ${{ github.event.inputs.create_release }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Release Type:** ${{ steps.version.outputs.release_type }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Bump Type:** ${{ github.event.inputs.bump }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📦 Artifacts Created" >> $GITHUB_STEP_SUMMARY
         echo "- Package zip file" >> $GITHUB_STEP_SUMMARY
+        echo "- Salesforce package version: ${{ steps.package_version.outputs.package_version_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Production URL: ${{ steps.package_version.outputs.production_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Sandbox URL: ${{ steps.package_version.outputs.sandbox_url }}" >> $GITHUB_STEP_SUMMARY
         echo "- Release notes" >> $GITHUB_STEP_SUMMARY
         echo "- Version file" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        if [ "${{ github.event.inputs.create_release }}" == "true" ]; then
-          echo "### 🔄 Next Steps" >> $GITHUB_STEP_SUMMARY
-          echo "✅ GitHub release created and README updated automatically!" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "### 🔄 Next Steps" >> $GITHUB_STEP_SUMMARY
-          echo "To create a GitHub release, re-run this workflow with 'Create GitHub release' enabled, or use the 'Publish Release' workflow manually." >> $GITHUB_STEP_SUMMARY
-        fi
+        echo "### 🔄 Next Steps" >> $GITHUB_STEP_SUMMARY
+        echo "✅ GitHub release created and README updated automatically!" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Package version created and ready for installation!" >> $GITHUB_STEP_SUMMARY
