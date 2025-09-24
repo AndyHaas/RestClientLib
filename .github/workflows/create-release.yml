@@ -15,8 +15,8 @@ on:
       release_type:
         type: choice
         description: 'Release type'
-        options: [stable, beta]
-        default: stable
+        options: [latest, prerelease]
+        default: latest
 
 permissions:
   contents: write  # commit version bump + tag
@@ -89,12 +89,12 @@ jobs:
         echo "  release_type: '${{ github.event.inputs.release_type }}'"
         echo "  Calculated NEW before beta check: '$NEW'"
         
-        # Add beta suffix if release type is beta
-        if [ "${{ github.event.inputs.release_type }}" == "beta" ]; then
+        # Add prerelease suffix if release type is prerelease
+        if [ "${{ github.event.inputs.release_type }}" == "prerelease" ]; then
           NEW="${NEW}-beta"
-          echo "  Added beta suffix: '$NEW'"
+          echo "  Added prerelease suffix: '$NEW'"
         else
-          echo "  No beta suffix added (release_type is not 'beta')"
+          echo "  No prerelease suffix added (release_type is not 'prerelease')"
         fi
         
         echo "current=$CUR" >> $GITHUB_OUTPUT
@@ -121,7 +121,7 @@ jobs:
     - name: Update sfdx-project.json version
       run: |
         NEW_VERSION="${{ steps.version.outputs.new }}"
-        # Extract numeric version (remove beta suffix if present) for versionNumber
+        # Extract numeric version (remove prerelease suffix if present) for versionNumber
         NUMERIC_VERSION=$(echo "$NEW_VERSION" | sed 's/-.*$//')
         
         # Update versionName in sfdx-project.json
@@ -423,8 +423,8 @@ jobs:
           echo "Production URL: $PRODUCTION_URL"
           echo "Sandbox URL: $SANDBOX_URL"
           
-          # Promote package version to released status if it's a stable release
-          if [ "${{ steps.version.outputs.release_type }}" == "stable" ]; then
+          # Promote package version to released status if it's a latest release
+          if [ "${{ steps.version.outputs.release_type }}" == "latest" ]; then
             echo "🚀 Promoting package version to released status..."
             PROMOTE_OUTPUT=$(sf package version promote \
               --package "$SF_PACKAGE1_ID@$PACKAGE_VERSION_ID" \
@@ -440,10 +440,10 @@ jobs:
               echo "✅ Successfully promoted package version to released status"
             else
               echo "⚠️ WARNING: Failed to promote package version to released status"
-              echo "Package will remain as beta version"
+              echo "Package will remain as prerelease version"
             fi
           else
-            echo "ℹ️ Package version remains as beta (release_type is beta)"
+            echo "ℹ️ Package version remains as prerelease (release_type is prerelease)"
           fi
         else
           echo "❌ ERROR: Failed to create package version"
@@ -547,10 +547,12 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.version.outputs.tag }}
-        name: REST API Library ${{ steps.version.outputs.tag }} (${{ steps.version.outputs.release_type }})
+        name: REST API Library ${{ steps.version.outputs.tag }}
         body_path: release_notes.md
         files: |
           REST-API-Library-v${{ steps.version.outputs.new }}.zip
+        prerelease: ${{ steps.version.outputs.release_type == 'prerelease' }}
+        latest: ${{ steps.version.outputs.release_type == 'latest' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
