@@ -147,11 +147,11 @@ jobs:
         PREV=$(git tag --sort=-creatordate | head -1)
         
         if [ -n "$PREV" ]; then
-          RANGE="$PREV..${{ steps.version.outputs.tag }}"
+          RANGE="$PREV..HEAD"
           COMPARE_LINK="https://github.com/${{ github.repository }}/compare/$PREV...${{ steps.version.outputs.tag }}"
         else
           FIRST=$(git rev-list --max-parents=0 HEAD)
-          RANGE="$FIRST..${{ steps.version.outputs.tag }}"
+          RANGE="$FIRST..HEAD"
           COMPARE_LINK="https://github.com/${{ github.repository }}/compare/$FIRST...${{ steps.version.outputs.tag }}"
         fi
         
