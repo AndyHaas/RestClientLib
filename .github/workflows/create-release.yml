@@ -143,6 +143,29 @@ jobs:
       run: |
         sf project convert source --root-dir force-app --output-dir mdapi_out
     
+    - name: Deploy to packaging org
+      run: |
+        echo "Deploying converted metadata to packaging org..."
+        echo "Source directory: mdapi_out"
+        echo "Target org: pkgorg"
+        
+        set +e  # Don't exit on error, we'll handle it manually
+        DEPLOY_OUTPUT=$(sf project deploy start --metadata-dir mdapi_out --target-org pkgorg --wait 60 --ignore-conflicts 2>&1)
+        DEPLOY_EXIT_CODE=$?
+        set -e  # Re-enable exit on error
+        
+        echo "Deploy exit code: $DEPLOY_EXIT_CODE"
+        echo "Deploy output:"
+        echo "$DEPLOY_OUTPUT"
+        
+        if [ $DEPLOY_EXIT_CODE -eq 0 ]; then
+          echo "✅ Successfully deployed to packaging org"
+        else
+          echo "❌ ERROR: Deployment failed with exit code $DEPLOY_EXIT_CODE"
+          echo "💡 Check the output above for specific error details"
+          exit 1
+        fi
+    
     - name: Run tests and check code coverage
       run: |
         echo "Running tests for package-specific test classes: NebulaAdapter_Test, RestLibTests"
@@ -247,29 +270,6 @@ jobs:
         
         # Clean up temporary test result file
         rm -f test_result.json
-
-    - name: Deploy to packaging org
-      run: |
-        echo "Deploying converted metadata to packaging org..."
-        echo "Source directory: mdapi_out"
-        echo "Target org: pkgorg"
-        
-        set +e  # Don't exit on error, we'll handle it manually
-        DEPLOY_OUTPUT=$(sf project deploy start --metadata-dir mdapi_out --target-org pkgorg --wait 60 --ignore-conflicts 2>&1)
-        DEPLOY_EXIT_CODE=$?
-        set -e  # Re-enable exit on error
-        
-        echo "Deploy exit code: $DEPLOY_EXIT_CODE"
-        echo "Deploy output:"
-        echo "$DEPLOY_OUTPUT"
-        
-        if [ $DEPLOY_EXIT_CODE -eq 0 ]; then
-          echo "✅ Successfully deployed to packaging org"
-        else
-          echo "❌ ERROR: Deployment failed with exit code $DEPLOY_EXIT_CODE"
-          echo "💡 Check the output above for specific error details"
-          exit 1
-        fi
     
     - name: Create package and version
       id: package_version
