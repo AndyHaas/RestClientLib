@@ -109,6 +109,15 @@ jobs:
         sed -i "s/PACKAGE_VERSION=\".*\"/PACKAGE_VERSION=\"$NEW_VERSION\"/" scripts/create-package.sh
         echo "Updated create-package.sh version to $NEW_VERSION"
     
+    - name: Update sfdx-project.json version
+      run: |
+        NEW_VERSION="${{ steps.version.outputs.new }}"
+        # Update versionName in sfdx-project.json
+        sed -i "s/\"versionName\": \"ver [^\"]*\"/\"versionName\": \"ver $NEW_VERSION\"/" sfdx-project.json
+        # Update versionNumber in sfdx-project.json (format: MAJOR.MINOR.PATCH.NEXT)
+        sed -i "s/\"versionNumber\": \"[^\"]*\"/\"versionNumber\": \"$NEW_VERSION.NEXT\"/" sfdx-project.json
+        echo "Updated sfdx-project.json version to $NEW_VERSION"
+    
     - name: Create package
       run: |
         chmod +x scripts/create-package.sh
@@ -164,7 +173,7 @@ jobs:
         GIT_COMMITTER_EMAIL: github-actions@users.noreply.github.com
       run: |
         set -e
-        git add VERSION package.json manifest/package.xml scripts/create-package.sh
+        git add VERSION package.json manifest/package.xml scripts/create-package.sh sfdx-project.json
         if ! git diff --quiet --staged; then
           git commit -m "chore(release): bump version to ${{ steps.version.outputs.new }}"
         fi
