@@ -103,12 +103,6 @@ jobs:
         sed -i "s/<version>.*<\/version>/<version>$API_VERSION.0<\/version>/" manifest/package.xml
         echo "Updated package.xml API version to $API_VERSION.0"
     
-    - name: Update script version
-      run: |
-        NEW_VERSION="${{ steps.version.outputs.new }}"
-        sed -i "s/PACKAGE_VERSION=\".*\"/PACKAGE_VERSION=\"$NEW_VERSION\"/" scripts/create-package.sh
-        echo "Updated create-package.sh version to $NEW_VERSION"
-    
     - name: Update sfdx-project.json version
       run: |
         NEW_VERSION="${{ steps.version.outputs.new }}"
@@ -120,8 +114,25 @@ jobs:
     
     - name: Create package
       run: |
-        chmod +x scripts/create-package.sh
-        ./scripts/create-package.sh || echo "Package creation completed"
+        # Create package directory
+        mkdir -p package
+        
+        # Copy source files
+        cp -r force-app package/
+        cp manifest/package.xml package/
+        cp README.md package/
+        cp docs/PACKAGE-README.md package/ 2>/dev/null || true
+        
+        # Create package zip
+        cd package
+        zip -r ../REST-API-Library-v${{ steps.version.outputs.new }}.zip .
+        cd ..
+        
+        echo "Created REST-API-Library-v${{ steps.version.outputs.new }}.zip"
+        
+        # Clean up package directory
+        rm -rf package
+        echo "Cleaned up temporary package directory"
     
     - name: Convert to MDAPI
       run: |
@@ -173,7 +184,7 @@ jobs:
         GIT_COMMITTER_EMAIL: github-actions@users.noreply.github.com
       run: |
         set -e
-        git add VERSION package.json manifest/package.xml scripts/create-package.sh sfdx-project.json
+        git add VERSION package.json manifest/package.xml sfdx-project.json
         if ! git diff --quiet --staged; then
           git commit -m "chore(release): bump version to ${{ steps.version.outputs.new }}"
         fi
