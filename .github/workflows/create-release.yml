@@ -82,9 +82,19 @@ jobs:
           NEW="$MAJOR.$MINOR.$PATCH"
         fi
         
+        # Debug: Show all input values
+        echo "🔍 DEBUG: Input values:"
+        echo "  bump: '${{ github.event.inputs.bump }}'"
+        echo "  custom_version: '${{ github.event.inputs.custom_version }}'"
+        echo "  release_type: '${{ github.event.inputs.release_type }}'"
+        echo "  Calculated NEW before beta check: '$NEW'"
+        
         # Add beta suffix if release type is beta
         if [ "${{ github.event.inputs.release_type }}" == "beta" ]; then
           NEW="${NEW}-beta"
+          echo "  Added beta suffix: '$NEW'"
+        else
+          echo "  No beta suffix added (release_type is not 'beta')"
         fi
         
         echo "current=$CUR" >> $GITHUB_OUTPUT
@@ -412,6 +422,29 @@ jobs:
           echo "✅ Created package version: $PACKAGE_VERSION_ID"
           echo "Production URL: $PRODUCTION_URL"
           echo "Sandbox URL: $SANDBOX_URL"
+          
+          # Promote package version to released status if it's a stable release
+          if [ "${{ steps.version.outputs.release_type }}" == "stable" ]; then
+            echo "🚀 Promoting package version to released status..."
+            PROMOTE_OUTPUT=$(sf package version promote \
+              --package "$SF_PACKAGE1_ID@$PACKAGE_VERSION_ID" \
+              --target-dev-hub pkgorg \
+              --json 2>&1)
+            PROMOTE_EXIT_CODE=$?
+            
+            echo "Package version promote exit code: $PROMOTE_EXIT_CODE"
+            echo "Package version promote output:"
+            echo "$PROMOTE_OUTPUT"
+            
+            if [ $PROMOTE_EXIT_CODE -eq 0 ]; then
+              echo "✅ Successfully promoted package version to released status"
+            else
+              echo "⚠️ WARNING: Failed to promote package version to released status"
+              echo "Package will remain as beta version"
+            fi
+          else
+            echo "ℹ️ Package version remains as beta (release_type is beta)"
+          fi
         else
           echo "❌ ERROR: Failed to create package version"
           echo "Exit code: $PACKAGE_VERSION_EXIT_CODE"
