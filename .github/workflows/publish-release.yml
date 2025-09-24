@@ -1,0 +1,116 @@
+name: Publish Release
+
+on:
+  workflow_run:
+    workflows: ["Build & Bump"]
+    types: [completed]
+
+permissions:
+  contents: write  # update README and create release
+  actions: read    # to fetch artifacts from triggering run
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download artifacts from Build & Bump run
+      uses: actions/download-artifact@v4
+      with:
+        # Pull all artifacts from the triggering workflow run
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        run-id: ${{ github.event.workflow_run.id }}
+        path: ./artifacts
+
+    - name: Inspect artifacts & derive tag
+      id: meta
+      run: |
+        ls -R artifacts
+        VERSION=$(cat artifacts/**/VERSION | tr -d '\n')
+        TAG="v$VERSION"
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        echo "Found version: $VERSION, tag: $TAG"
+
+    - name: Checkout repo (to update README)
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+        fetch-depth: 0
+
+    - name: Prepare README block
+      run: |
+        PACKAGE_FILE="REST-API-Library-v${{ steps.meta.outputs.version }}.zip"
+        
+        {
+          echo "<!--LATEST-RELEASE-START-->"
+          echo "**Version:** ${{ steps.meta.outputs.version }}  "
+          echo "**Tag:** ${{ steps.meta.outputs.tag }}  "
+          echo "**Package:** [$PACKAGE_FILE](https://github.com/${{ github.repository }}/releases/download/${{ steps.meta.outputs.tag }}/$PACKAGE_FILE)  "
+          echo "**Release Date:** $(date -u +"%Y-%m-%d")  "
+          echo ""
+          echo "<details><summary>Change summary</summary>"
+          echo ""
+          # Skip first 5 lines (header) from notes if desired:
+          awk 'NR>5 {print}' artifacts/**/release_notes.md
+          echo "</details>"
+          echo "<!--LATEST-RELEASE-END-->"
+        } > latest_block.md
+
+        # Update README with the new block
+        awk '
+          BEGIN{printing=1}
+          /<!--LATEST-RELEASE-START-->/ {print; system("cat latest_block.md"); printing=0; next}
+          /<!--LATEST-RELEASE-END-->/ {print; printing=1; next}
+          printing==1 {print}
+        ' README.md > README.new
+
+        mv README.new README.md
+        rm latest_block.md
+        echo "Updated README with latest release information"
+
+    - name: Commit README update
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GIT_AUTHOR_NAME: github-actions
+        GIT_AUTHOR_EMAIL: github-actions@users.noreply.github.com
+        GIT_COMMITTER_NAME: github-actions
+        GIT_COMMITTER_EMAIL: github-actions@users.noreply.github.com
+      run: |
+        set -e
+        if ! git diff --quiet; then
+          git add README.md
+          git commit -m "docs: update README for ${{ steps.meta.outputs.tag }}"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+          echo "Committed README update"
+        else
+          echo "No README changes to commit"
+        fi
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.meta.outputs.tag }}
+        name: REST API Library ${{ steps.meta.outputs.tag }}
+        body_path: artifacts/**/release_notes.md
+        files: |
+          artifacts/**/REST-API-Library-v*.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Summary
+      run: |
+        echo "## 🚀 Release Published Successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Version:** ${{ steps.meta.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Tag:** ${{ steps.meta.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📦 Release Created" >> $GITHUB_STEP_SUMMARY
+        echo "- GitHub release with download links" >> $GITHUB_STEP_SUMMARY
+        echo "- README updated with latest release info" >> $GITHUB_STEP_SUMMARY
+        echo "- Package zip file attached to release" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
+        echo "- [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ steps.meta.outputs.tag }})" >> $GITHUB_STEP_SUMMARY
+        echo "- [Download Package](https://github.com/${{ github.repository }}/releases/download/${{ steps.meta.outputs.tag }}/REST-API-Library-v${{ steps.meta.outputs.version }}.zip)" >> $GITHUB_STEP_SUMMARY

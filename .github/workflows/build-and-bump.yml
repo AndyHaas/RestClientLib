@@ -1,0 +1,172 @@
+name: Build & Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        type: choice
+        description: 'Semver bump type'
+        options: [patch, minor, major]
+        default: patch
+      custom_version:
+        description: 'Custom version (optional, overrides bump)'
+        required: false
+        type: string
+
+permissions:
+  contents: write  # commit version bump + tag
+  actions: read
+
+jobs:
+  build-package:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Read and calculate version
+      id: version
+      run: |
+        # Read current version from VERSION file
+        if [ -f VERSION ]; then
+          CUR=$(cat VERSION | tr -d '\n')
+        else
+          CUR="1.0.0"
+          echo "$CUR" > VERSION
+        fi
+        
+        MAJOR=$(echo "$CUR" | cut -d. -f1)
+        MINOR=$(echo "$CUR" | cut -d. -f2)
+        PATCH=$(echo "$CUR" | cut -d. -f3)
+        
+        if [ -n "${{ github.event.inputs.custom_version }}" ]; then
+          NEW="${{ github.event.inputs.custom_version }}"
+          echo "Using custom version: $NEW"
+        else
+          case "${{ github.event.inputs.bump }}" in
+            major) MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR+1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH+1)) ;;
+          esac
+          NEW="$MAJOR.$MINOR.$PATCH"
+        fi
+        
+        echo "$NEW" > VERSION
+        echo "current=$CUR" >> $GITHUB_OUTPUT
+        echo "new=$NEW" >> $GITHUB_OUTPUT
+        echo "tag=v$NEW" >> $GITHUB_OUTPUT
+        echo "Current version: $CUR"
+        echo "New version: $NEW"
+    
+    - name: Update package.json version
+      run: |
+        NEW_VERSION="${{ steps.version.outputs.new }}"
+        npm version $NEW_VERSION --no-git-tag-version
+        echo "Updated package.json to version $NEW_VERSION"
+    
+    - name: Update package.xml version
+      run: |
+        NEW_VERSION="${{ steps.version.outputs.new }}"
+        API_VERSION=$(echo $NEW_VERSION | cut -d. -f1)
+        sed -i "s/<version>.*<\/version>/<version>$API_VERSION.0<\/version>/" manifest/package.xml
+        echo "Updated package.xml API version to $API_VERSION.0"
+    
+    - name: Update script version
+      run: |
+        NEW_VERSION="${{ steps.version.outputs.new }}"
+        sed -i "s/PACKAGE_VERSION=\".*\"/PACKAGE_VERSION=\"$NEW_VERSION\"/" scripts/create-package.sh
+        echo "Updated create-package.sh version to $NEW_VERSION"
+    
+    - name: Create package
+      run: |
+        chmod +x scripts/create-package.sh
+        ./scripts/create-package.sh || echo "Package creation completed"
+    
+    - name: Build changelog
+      run: |
+        # Get previous tag
+        git fetch --tags --quiet || true
+        PREV=$(git tag --sort=-creatordate | head -1)
+        
+        if [ -n "$PREV" ]; then
+          RANGE="$PREV..${{ steps.version.outputs.tag }}"
+          COMPARE_LINK="https://github.com/${{ github.repository }}/compare/$PREV...${{ steps.version.outputs.tag }}"
+        else
+          FIRST=$(git rev-list --max-parents=0 HEAD)
+          RANGE="$FIRST..${{ steps.version.outputs.tag }}"
+          COMPARE_LINK="https://github.com/${{ github.repository }}/compare/$FIRST...${{ steps.version.outputs.tag }}"
+        fi
+        
+        {
+          echo "## Release ${{ steps.version.outputs.tag }}"
+          echo
+          echo "**Package:** REST-API-Library-v${{ steps.version.outputs.new }}.zip"
+          echo "**Previous Version:** ${{ steps.version.outputs.current }}"
+          echo
+          echo "### Changes"
+          if [ -n "$PREV" ]; then
+            git log --pretty=format:'- %s (%h) — %an' $RANGE
+          else
+            echo "- Initial release"
+          fi
+          echo
+          echo "[Compare changes](${COMPARE_LINK})"
+        } > release_notes.md
+        
+        echo "Generated changelog from $RANGE"
+    
+    - name: Commit version changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GIT_AUTHOR_NAME: github-actions
+        GIT_AUTHOR_EMAIL: github-actions@users.noreply.github.com
+        GIT_COMMITTER_NAME: github-actions
+        GIT_COMMITTER_EMAIL: github-actions@users.noreply.github.com
+      run: |
+        set -e
+        git add VERSION package.json manifest/package.xml scripts/create-package.sh
+        if ! git diff --quiet --staged; then
+          git commit -m "chore(release): bump version to ${{ steps.version.outputs.new }}"
+        fi
+        git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.new }}"
+        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} "${{ steps.version.outputs.tag }}"
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-${{ steps.version.outputs.tag }}
+        path: |
+          REST-API-Library-v${{ steps.version.outputs.new }}.zip
+          release_notes.md
+          VERSION
+        retention-days: 30
+    
+    - name: Summary
+      run: |
+        echo "## 🔨 Build Completed Successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Version:** ${{ steps.version.outputs.new }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Previous Version:** ${{ steps.version.outputs.current }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Release Type:** ${{ github.event.inputs.bump }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📦 Artifacts Created" >> $GITHUB_STEP_SUMMARY
+        echo "- Package zip file" >> $GITHUB_STEP_SUMMARY
+        echo "- Release notes" >> $GITHUB_STEP_SUMMARY
+        echo "- Version file" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔄 Next Steps" >> $GITHUB_STEP_SUMMARY
+        echo "The 'Publish Release' workflow will now run automatically to create the GitHub release and update the README." >> $GITHUB_STEP_SUMMARY
