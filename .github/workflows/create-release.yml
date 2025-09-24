@@ -176,6 +176,14 @@ jobs:
         if echo "$TEST_RESULT" | jq -e '.result.summary' > /dev/null 2>&1; then
           SUMMARY=$(echo "$TEST_RESULT" | jq -r '.result.summary')
           echo "Test Summary: $SUMMARY"
+          
+          # Show detailed test counts
+          PASSING=$(echo "$TEST_RESULT" | jq -r '.result.summary.passing // 0')
+          FAILING=$(echo "$TEST_RESULT" | jq -r '.result.summary.failing // 0')
+          SKIPPED=$(echo "$TEST_RESULT" | jq -r '.result.summary.skipped // 0')
+          TESTS_RAN=$(echo "$TEST_RESULT" | jq -r '.result.summary.testsRan // 0')
+          
+          echo "📈 Test Results: $PASSING passed, $FAILING failed, $SKIPPED skipped (Total: $TESTS_RAN)"
         fi
         
         # Extract coverage percentage - try multiple possible locations in the JSON
@@ -194,8 +202,30 @@ jobs:
         if [ -n "$COVERAGE" ]; then
           MIN_COVERAGE=75
           if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
-            echo "❌ ERROR: Code coverage $COVERAGE% is below minimum requirement of $MIN_COVERAGE%"
-            echo "💡 Consider adding more test methods or improving existing test coverage"
+            echo ""
+            echo "❌ COVERAGE FAILURE: Code coverage $COVERAGE% is below minimum requirement of $MIN_COVERAGE%"
+            echo ""
+            echo "📊 COVERAGE ANALYSIS:"
+            echo "  Current Coverage: $COVERAGE%"
+            echo "  Required Coverage: $MIN_COVERAGE%"
+            echo "  Coverage Gap: $((MIN_COVERAGE - COVERAGE))%"
+            echo ""
+            echo "🔍 TEST CLASSES BEING VALIDATED:"
+            echo "  - NebulaAdapter_Test"
+            echo "  - RestLibTests"
+            echo ""
+            echo "💡 TO FIX THIS ISSUE:"
+            echo "  1. Add more test methods to cover uncovered code paths"
+            echo "  2. Improve existing test methods to cover more scenarios"
+            echo "  3. Review uncovered lines in the test results above"
+            echo "  4. Ensure all public methods and critical code paths are tested"
+            echo ""
+            echo "📋 NEXT STEPS:"
+            echo "  - Check the detailed coverage information in the test output above"
+            echo "  - Look for 'uncoveredLines' in the JSON output to see which lines need testing"
+            echo "  - Add test methods for any missing scenarios"
+            echo "  - Re-run the workflow after improving test coverage"
+            echo ""
             exit 1
           else
             echo "✅ SUCCESS: Code coverage $COVERAGE% meets minimum requirement of $MIN_COVERAGE%"
