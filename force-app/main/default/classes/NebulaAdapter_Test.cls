@@ -107,7 +107,7 @@ private class NebulaAdapter_Test {
         // Assert — request
         System.assertEquals('DELETE', mock.lastRequest.getMethod(), 'DEL should map to DELETE');
         System.assertEquals('application/json', mock.lastRequest.getHeader('Accept'), 'Should have correct Accept header');
-        System.assertEquals(null, mock.lastRequest.getBody(), 'DELETE should not have a body by default');
+        System.assert(String.isBlank(mock.lastRequest.getBody()), 'DELETE should not have a body by default');
 
         // Nebula adapter no-ops again
         NebulaAdapter.debug('Another test log', a);
