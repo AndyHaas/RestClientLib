@@ -168,7 +168,7 @@ public with sharing class RestLibApiCall {
 			if (this.encodedQueryValue == null) {
 				this.encodedQueryValue = '?_HttpMethod=PATCH';
 			} else {
-				this.encodedQueryValue += '?_HttpMethod=PATCH';
+				this.encodedQueryValue += '&_HttpMethod=PATCH';
 			}
 		}
 		return this;
@@ -314,10 +314,14 @@ public with sharing class RestLibApiCall {
 		this.bodyValue = body;
 		this.headersValue = headers;
 
-		this.encodedQueryValue = EncodingUtil.urlEncode(query, 'UTF-8');
+		this.encodedQueryValue = String.isNotBlank(query) ? EncodingUtil.urlEncode(query, 'UTF-8') : null;
 		if (method == HttpVerb.PATCH) {
 			this.methodValue = HttpVerb.POST;
-			this.encodedQueryValue += '?_HttpMethod=PATCH';
+			if (this.encodedQueryValue == null) {
+				this.encodedQueryValue = '?_HttpMethod=PATCH';
+			} else {
+				this.encodedQueryValue += '&_HttpMethod=PATCH';
+			}
 		}
 	}
 

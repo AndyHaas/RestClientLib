@@ -744,7 +744,7 @@ private class RestLibTests {
 		Assert.areEqual(null, call1.encodedQuery, 'Empty query should return null for encodedQuery');
 		Assert.areEqual(null, call2.encodedQuery, 'Null query should return null for encodedQuery');
 		Assert.areEqual('?param%3Dvalue', call3.encodedQuery, 'Query should be URL encoded');
-		Assert.areEqual('?prefixed', call4.encodedQuery, 'Pre-prefixed query should remain unchanged');
+		Assert.areEqual('?%3Fprefixed', call4.encodedQuery, 'Pre-prefixed query should be URL encoded');
 	}
 
 	@isTest
