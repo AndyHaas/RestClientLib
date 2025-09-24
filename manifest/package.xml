@@ -12,5 +12,5 @@
         <members>RestLibTests</members>
         <name>ApexClass</name>
     </types>
-    <version>64.0</version>
+    <version>1.0</version>
 </Package>
