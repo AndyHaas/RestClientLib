@@ -426,11 +426,32 @@ jobs:
           # Promote package version to released status if it's a latest release
           if [ "${{ steps.version.outputs.release_type }}" == "latest" ]; then
             echo "🚀 Promoting package version to released status..."
+            echo "🔍 Debug: Package version ID: $PACKAGE_VERSION_ID"
+            echo "🔍 Debug: Target dev hub: pkgorg"
+            
+            # Check if package version is ready for promotion
+            echo "🔍 Checking package version status..."
+            VERSION_STATUS=$(echo "$PACKAGE_VERSION_OUTPUT" | jq -r '.result.Status // "Unknown"')
+            CODE_COVERAGE_PASSED=$(echo "$PACKAGE_VERSION_OUTPUT" | jq -r '.result.HasPassedCodeCoverageCheck // false')
+            
+            echo "Package version status: $VERSION_STATUS"
+            echo "Code coverage passed: $CODE_COVERAGE_PASSED"
+            
+            if [ "$CODE_COVERAGE_PASSED" = "false" ]; then
+              echo "⚠️ WARNING: Code coverage check has not passed yet"
+              echo "Package version may not be ready for promotion"
+              echo "Waiting 30 seconds for code coverage to complete..."
+              sleep 30
+            fi
+            
+            # Run promotion with better error handling
+            set +e  # Don't exit on error, we'll handle it manually
             PROMOTE_OUTPUT=$(sf package version promote \
               --package "$PACKAGE_VERSION_ID" \
               --target-dev-hub pkgorg \
               --json 2>&1)
             PROMOTE_EXIT_CODE=$?
+            set -e  # Re-enable exit on error
             
             echo "Package version promote exit code: $PROMOTE_EXIT_CODE"
             echo "Package version promote output:"
@@ -440,7 +461,24 @@ jobs:
               echo "✅ Successfully promoted package version to released status"
             else
               echo "⚠️ WARNING: Failed to promote package version to released status"
+              echo "Exit code: $PROMOTE_EXIT_CODE"
+              echo "Error details:"
+              echo "$PROMOTE_OUTPUT"
+              
+              # Try to extract specific error information
+              if echo "$PROMOTE_OUTPUT" | jq -e '.message' > /dev/null 2>&1; then
+                ERROR_MSG=$(echo "$PROMOTE_OUTPUT" | jq -r '.message')
+                echo "Error message: $ERROR_MSG"
+              fi
+              
+              if echo "$PROMOTE_OUTPUT" | jq -e '.result[0].error' > /dev/null 2>&1; then
+                ERROR_DETAILS=$(echo "$PROMOTE_OUTPUT" | jq -r '.result[0].error')
+                echo "Error details: $ERROR_DETAILS"
+              fi
+              
               echo "Package will remain as prerelease version"
+              echo "You can manually promote it later using:"
+              echo "sf package version promote --package $PACKAGE_VERSION_ID --target-dev-hub pkgorg"
             fi
           else
             echo "ℹ️ Package version remains as prerelease (release_type is prerelease)"
