@@ -5,136 +5,248 @@ A comprehensive Salesforce Apex library that provides a clean, type-safe, and ex
 ## Latest Release
 <!--LATEST-RELEASE-START-->
 <!--LATEST-RELEASE-START-->
-**Version:** 1.0.7  
-**Tag:** v1.0.7  
+**Version:** 1.0.8  
+**Tag:** v1.0.8  
 **Release Type:** latest  
-**Package Version ID:** 04tQm000002zANtIAM  
-**Package:** [REST-API-Library-v1.0.7.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.7/REST-API-Library-v1.0.7.zip)  
+**Package Version ID:** 04tQm000002zB8fIAE  
+**Package:** [REST-API-Library-v1.0.8.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.8/REST-API-Library-v1.0.8.zip)  
 **Release Date:** 2025-09-24  
 
 ### Quick Install
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **CLI:** `sf package install --package 04tQm000002zANtIAM --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
 
 <details><summary>Change summary</summary>
 
-**Package Version ID:** 04tQm000002zANtIAM
+**Package Version ID:** 04tQm000002zB8fIAE
 
 ### Installation
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **CLI:** `sf package install --package 04tQm000002zANtIAM --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
 
 ### Changes
-- fix: improve package version promotion debugging and error handling (6992426) — Andy Haas
-- fix: correct package version promote command format (adc78a1) — Andy Haas
-- feat: update workflow to use standard prerelease/latest terminology (c64d608) — Andy Haas
-- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (5acf439) — Andy Haas
-- fix: add package version promotion for stable releases (c7a1ac2) — Andy Haas
-- docs: update README for v1.0.6 (e78ad1b) — github-actions
-[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.6...v1.0.7)
+- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (8237573) — Andy Haas
+- fix: add --code-coverage flag to package version creation (85f0976) — Andy Haas
+- docs: update README for v1.0.7 (0ce65c3) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.7...v1.0.8)
 </details>
 <!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-START-->
 <!--LATEST-RELEASE-START-->
-**Version:** 1.0.7  
-**Tag:** v1.0.7  
+**Version:** 1.0.8  
+**Tag:** v1.0.8  
 **Release Type:** latest  
-**Package Version ID:** 04tQm000002zANtIAM  
-**Package:** [REST-API-Library-v1.0.7.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.7/REST-API-Library-v1.0.7.zip)  
+**Package Version ID:** 04tQm000002zB8fIAE  
+**Package:** [REST-API-Library-v1.0.8.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.8/REST-API-Library-v1.0.8.zip)  
 **Release Date:** 2025-09-24  
 
 ### Quick Install
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **CLI:** `sf package install --package 04tQm000002zANtIAM --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
 
 <details><summary>Change summary</summary>
 
-**Package Version ID:** 04tQm000002zANtIAM
+**Package Version ID:** 04tQm000002zB8fIAE
 
 ### Installation
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **CLI:** `sf package install --package 04tQm000002zANtIAM --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
 
 ### Changes
-- fix: improve package version promotion debugging and error handling (6992426) — Andy Haas
-- fix: correct package version promote command format (adc78a1) — Andy Haas
-- feat: update workflow to use standard prerelease/latest terminology (c64d608) — Andy Haas
-- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (5acf439) — Andy Haas
-- fix: add package version promotion for stable releases (c7a1ac2) — Andy Haas
-- docs: update README for v1.0.6 (e78ad1b) — github-actions
-[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.6...v1.0.7)
+- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (8237573) — Andy Haas
+- fix: add --code-coverage flag to package version creation (85f0976) — Andy Haas
+- docs: update README for v1.0.7 (0ce65c3) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.7...v1.0.8)
 </details>
 <!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-START-->
 <!--LATEST-RELEASE-START-->
-**Version:** 1.0.7  
-**Tag:** v1.0.7  
+**Version:** 1.0.8  
+**Tag:** v1.0.8  
 **Release Type:** latest  
-**Package Version ID:** 04tQm000002zANtIAM  
-**Package:** [REST-API-Library-v1.0.7.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.7/REST-API-Library-v1.0.7.zip)  
+**Package Version ID:** 04tQm000002zB8fIAE  
+**Package:** [REST-API-Library-v1.0.8.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.8/REST-API-Library-v1.0.8.zip)  
 **Release Date:** 2025-09-24  
 
 ### Quick Install
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **CLI:** `sf package install --package 04tQm000002zANtIAM --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
 
 <details><summary>Change summary</summary>
 
-**Package Version ID:** 04tQm000002zANtIAM
+**Package Version ID:** 04tQm000002zB8fIAE
 
 ### Installation
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **CLI:** `sf package install --package 04tQm000002zANtIAM --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
 
 ### Changes
-- fix: improve package version promotion debugging and error handling (6992426) — Andy Haas
-- fix: correct package version promote command format (adc78a1) — Andy Haas
-- feat: update workflow to use standard prerelease/latest terminology (c64d608) — Andy Haas
-- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (5acf439) — Andy Haas
-- fix: add package version promotion for stable releases (c7a1ac2) — Andy Haas
-- docs: update README for v1.0.6 (e78ad1b) — github-actions
-[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.6...v1.0.7)
+- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (8237573) — Andy Haas
+- fix: add --code-coverage flag to package version creation (85f0976) — Andy Haas
+- docs: update README for v1.0.7 (0ce65c3) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.7...v1.0.8)
 </details>
 <!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-START-->
 <!--LATEST-RELEASE-START-->
-**Version:** 1.0.7  
-**Tag:** v1.0.7  
+**Version:** 1.0.8  
+**Tag:** v1.0.8  
 **Release Type:** latest  
-**Package Version ID:** 04tQm000002zANtIAM  
-**Package:** [REST-API-Library-v1.0.7.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.7/REST-API-Library-v1.0.7.zip)  
+**Package Version ID:** 04tQm000002zB8fIAE  
+**Package:** [REST-API-Library-v1.0.8.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.8/REST-API-Library-v1.0.8.zip)  
 **Release Date:** 2025-09-24  
 
 ### Quick Install
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **CLI:** `sf package install --package 04tQm000002zANtIAM --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
 
 <details><summary>Change summary</summary>
 
-**Package Version ID:** 04tQm000002zANtIAM
+**Package Version ID:** 04tQm000002zB8fIAE
 
 ### Installation
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zANtIAM)
-- **CLI:** `sf package install --package 04tQm000002zANtIAM --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
 
 ### Changes
-- fix: improve package version promotion debugging and error handling (6992426) — Andy Haas
-- fix: correct package version promote command format (adc78a1) — Andy Haas
-- feat: update workflow to use standard prerelease/latest terminology (c64d608) — Andy Haas
-- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (5acf439) — Andy Haas
-- fix: add package version promotion for stable releases (c7a1ac2) — Andy Haas
-- docs: update README for v1.0.6 (e78ad1b) — github-actions
-[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.6...v1.0.7)
+- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (8237573) — Andy Haas
+- fix: add --code-coverage flag to package version creation (85f0976) — Andy Haas
+- docs: update README for v1.0.7 (0ce65c3) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.7...v1.0.8)
 </details>
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-START-->
+<!--LATEST-RELEASE-START-->
+**Version:** 1.0.8  
+**Tag:** v1.0.8  
+**Release Type:** latest  
+**Package Version ID:** 04tQm000002zB8fIAE  
+**Package:** [REST-API-Library-v1.0.8.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.8/REST-API-Library-v1.0.8.zip)  
+**Release Date:** 2025-09-24  
+
+### Quick Install
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
+
+<details><summary>Change summary</summary>
+
+**Package Version ID:** 04tQm000002zB8fIAE
+
+### Installation
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
+
+### Changes
+- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (8237573) — Andy Haas
+- fix: add --code-coverage flag to package version creation (85f0976) — Andy Haas
+- docs: update README for v1.0.7 (0ce65c3) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.7...v1.0.8)
+</details>
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-START-->
+<!--LATEST-RELEASE-START-->
+**Version:** 1.0.8  
+**Tag:** v1.0.8  
+**Release Type:** latest  
+**Package Version ID:** 04tQm000002zB8fIAE  
+**Package:** [REST-API-Library-v1.0.8.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.8/REST-API-Library-v1.0.8.zip)  
+**Release Date:** 2025-09-24  
+
+### Quick Install
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
+
+<details><summary>Change summary</summary>
+
+**Package Version ID:** 04tQm000002zB8fIAE
+
+### Installation
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
+
+### Changes
+- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (8237573) — Andy Haas
+- fix: add --code-coverage flag to package version creation (85f0976) — Andy Haas
+- docs: update README for v1.0.7 (0ce65c3) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.7...v1.0.8)
+</details>
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-START-->
+<!--LATEST-RELEASE-START-->
+**Version:** 1.0.8  
+**Tag:** v1.0.8  
+**Release Type:** latest  
+**Package Version ID:** 04tQm000002zB8fIAE  
+**Package:** [REST-API-Library-v1.0.8.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.8/REST-API-Library-v1.0.8.zip)  
+**Release Date:** 2025-09-24  
+
+### Quick Install
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
+
+<details><summary>Change summary</summary>
+
+**Package Version ID:** 04tQm000002zB8fIAE
+
+### Installation
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
+
+### Changes
+- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (8237573) — Andy Haas
+- fix: add --code-coverage flag to package version creation (85f0976) — Andy Haas
+- docs: update README for v1.0.7 (0ce65c3) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.7...v1.0.8)
+</details>
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-START-->
+<!--LATEST-RELEASE-START-->
+**Version:** 1.0.8  
+**Tag:** v1.0.8  
+**Release Type:** latest  
+**Package Version ID:** 04tQm000002zB8fIAE  
+**Package:** [REST-API-Library-v1.0.8.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.8/REST-API-Library-v1.0.8.zip)  
+**Release Date:** 2025-09-24  
+
+### Quick Install
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
+
+<details><summary>Change summary</summary>
+
+**Package Version ID:** 04tQm000002zB8fIAE
+
+### Installation
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002zB8fIAE)
+- **CLI:** `sf package install --package 04tQm000002zB8fIAE --wait 10 --installation-key-bypass`
+
+### Changes
+- Merge branch 'master' of https://github.com/AndyHaas/RestClientLib (8237573) — Andy Haas
+- fix: add --code-coverage flag to package version creation (85f0976) — Andy Haas
+- docs: update README for v1.0.7 (0ce65c3) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.7...v1.0.8)
+</details>
+<!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-END-->
