@@ -151,7 +151,7 @@ jobs:
     - name: Create package version
       id: package_version
       env:
-        SF_PACKAGE1_ID: ${{ secrets.SF_PACKAGE1_ID }}
+        SF_PACKAGE1_ID: ${{ vars.SF_PACKAGE1_ID }}
       run: |
         # Create a new package version
         PACKAGE_VERSION_OUTPUT=$(sf package version create \
