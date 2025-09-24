@@ -19,7 +19,7 @@ on:
 
 permissions:
   contents: write  # commit version bump + tag
-  actions: read
+  actions: write   # trigger other workflows
 
 jobs:
   build-package:
@@ -199,19 +199,68 @@ jobs:
           release_notes.md
         retention-days: 30
     
-    - name: Trigger Publish Release (if requested)
+    - name: Create GitHub Release (if requested)
       if: ${{ github.event.inputs.create_release == 'true' }}
-      uses: actions/github-script@v7
+      uses: softprops/action-gh-release@v2
       with:
-        script: |
-          const { owner, repo } = context.repo;
-          const { data } = await github.rest.actions.createWorkflowDispatch({
-            owner,
-            repo,
-            workflow_id: 'publish-release.yml',
-            ref: context.ref
-          });
-          console.log('Triggered Publish Release workflow');
+        tag_name: ${{ steps.version.outputs.tag }}
+        name: REST API Library ${{ steps.version.outputs.tag }}
+        body_path: release_notes.md
+        files: |
+          REST-API-Library-v${{ steps.version.outputs.new }}.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update README with release info (if requested)
+      if: ${{ github.event.inputs.create_release == 'true' }}
+      run: |
+        PACKAGE_FILE="REST-API-Library-v${{ steps.version.outputs.new }}.zip"
+        
+        {
+          echo "<!--LATEST-RELEASE-START-->"
+          echo "**Version:** ${{ steps.version.outputs.new }}  "
+          echo "**Tag:** ${{ steps.version.outputs.tag }}  "
+          echo "**Package:** [$PACKAGE_FILE](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/$PACKAGE_FILE)  "
+          echo "**Release Date:** $(date -u +"%Y-%m-%d")  "
+          echo ""
+          echo "<details><summary>Change summary</summary>"
+          echo ""
+          # Skip first 5 lines (header) from notes if desired:
+          awk 'NR>5 {print}' release_notes.md
+          echo "</details>"
+          echo "<!--LATEST-RELEASE-END-->"
+        } > latest_block.md
+
+        # Update README with the new block
+        awk '
+          BEGIN{printing=1}
+          /<!--LATEST-RELEASE-START-->/ {print; system("cat latest_block.md"); printing=0; next}
+          /<!--LATEST-RELEASE-END-->/ {print; printing=1; next}
+          printing==1 {print}
+        ' README.md > README.md.new
+
+        mv README.md.new README.md
+        rm latest_block.md
+        echo "Updated README.md with latest release information"
+
+    - name: Commit README update (if requested)
+      if: ${{ github.event.inputs.create_release == 'true' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GIT_AUTHOR_NAME: github-actions
+        GIT_AUTHOR_EMAIL: github-actions@users.noreply.github.com
+        GIT_COMMITTER_NAME: github-actions
+        GIT_COMMITTER_EMAIL: github-actions@users.noreply.github.com
+      run: |
+        set -e
+        if ! git diff --quiet; then
+          git add README.md
+          git commit -m "docs: update README for ${{ steps.version.outputs.tag }}"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+          echo "Committed README update"
+        else
+          echo "No README changes to commit"
+        fi
 
     - name: Summary
       run: |
@@ -229,8 +278,8 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         if [ "${{ github.event.inputs.create_release }}" == "true" ]; then
           echo "### 🔄 Next Steps" >> $GITHUB_STEP_SUMMARY
-          echo "The 'Publish Release' workflow has been triggered to create the GitHub release and update the README." >> $GITHUB_STEP_SUMMARY
+          echo "✅ GitHub release created and README updated automatically!" >> $GITHUB_STEP_SUMMARY
         else
           echo "### 🔄 Next Steps" >> $GITHUB_STEP_SUMMARY
-          echo "To create a GitHub release, run the 'Publish Release' workflow manually or re-run this workflow with 'Create GitHub release' enabled." >> $GITHUB_STEP_SUMMARY
+          echo "To create a GitHub release, re-run this workflow with 'Create GitHub release' enabled, or use the 'Publish Release' workflow manually." >> $GITHUB_STEP_SUMMARY
         fi
