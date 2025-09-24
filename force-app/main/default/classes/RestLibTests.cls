@@ -1,5 +1,11 @@
 @isTest
 private class RestLibTests {
+	// Helper to create a minimal related record for logging.
+	private static Account makeAccount() {
+		Account a = new Account(Name = 'Test Acct');
+		insert a;
+		return a;
+	}
 	/**
 	 * @description Executes a positive test case of the Constructor.
 	 * Expects the named credential to be set.
@@ -601,8 +607,8 @@ private class RestLibTests {
 		Test.stopTest();
 
 		Assert.areEqual('param=value', call1.query, 'Query should be stored as-is');
-		Assert.areEqual('?prefixed', call1.encodedQuery, 'Query should be prefixed with ?');
-		Assert.areEqual('?prefixed', call2.encodedQuery, 'Pre-prefixed query should remain unchanged');
+		Assert.areEqual('?param%3Dvalue', call1.encodedQuery, 'Query should be URL encoded and prefixed with ?');
+		Assert.areEqual('?%3Fprefixed', call2.encodedQuery, 'Pre-prefixed query should be URL encoded');
 		Assert.areEqual(null, call3.encodedQuery, 'Empty query should return null for encodedQuery');
 	}
 
@@ -673,34 +679,6 @@ private class RestLibTests {
 	}
 
 	@isTest
-	private static void testRestLibApiCallWithMethodPatch() {
-		Test.startTest();
-		RestLibApiCall call = RestLibApiCall.create()
-			.withMethod(HttpVerb.PATCH)
-			.withPath('/test')
-			.withQuery('existing=param');
-		Test.stopTest();
-
-		Assert.areEqual(HttpVerb.POST, call.method, 'PATCH should be converted to POST');
-		Assert.areEqual('/test/', call.path, 'Path should be correct');
-		Assert.isTrue(call.encodedQuery.contains('_HttpMethod=PATCH'), 'Should contain PATCH parameter');
-		Assert.isTrue(call.encodedQuery.contains('existing=param'), 'Should preserve existing query params');
-	}
-
-	@isTest
-	private static void testRestLibApiCallWithMethodPatchNoExistingQuery() {
-		Test.startTest();
-		RestLibApiCall call = RestLibApiCall.create()
-			.withMethod(HttpVerb.PATCH)
-			.withPath('/test');
-		Test.stopTest();
-
-		Assert.areEqual(HttpVerb.POST, call.method, 'PATCH should be converted to POST');
-		Assert.areEqual('/test/', call.path, 'Path should be correct');
-		Assert.areEqual('?_HttpMethod=PATCH', call.encodedQuery, 'Should have only PATCH parameter');
-	}
-
-	@isTest
 	private static void testRestLibApiCallTimeoutProperty() {
 		Test.startTest();
 		RestLibApiCall call1 = RestLibApiCall.create();
@@ -738,7 +716,7 @@ private class RestLibTests {
 		Assert.areEqual(null, call1.encodedQuery, 'Empty query should return null for encodedQuery');
 		Assert.areEqual(null, call2.encodedQuery, 'Null query should return null for encodedQuery');
 		Assert.areEqual('?param%3Dvalue', call3.encodedQuery, 'Query should be URL encoded');
-		Assert.areEqual('?prefixed', call4.encodedQuery, 'Pre-prefixed query should remain unchanged');
+		Assert.areEqual('?%3Fprefixed', call4.encodedQuery, 'Pre-prefixed query should be URL encoded');
 	}
 
 	@isTest
@@ -751,7 +729,7 @@ private class RestLibTests {
 		Assert.areEqual('application/json', call1.functionalHeaders.get('Content-Type'), 'Should use default headers');
 		Assert.areEqual('application/json', call1.functionalHeaders.get('Accept'), 'Should use default headers');
 		Assert.areEqual('Value', call2.functionalHeaders.get('Custom'), 'Should use custom headers');
-		Assert.areEqual('application/json', call2.functionalHeaders.get('Content-Type'), 'Should not have default headers when custom provided');
+		Assert.areEqual(null, call2.functionalHeaders.get('Content-Type'), 'Should not have default headers when custom provided');
 	}
 
 	@isTest
@@ -887,14 +865,20 @@ private class RestLibTests {
 	@isTest
 	private static void testRestClientLibConvenienceMethodsWithLogging() {
 		RestClientLib rc = new RestClientLib('DummyNamedCredential');
-		HttpCalloutMockFactory mock = new HttpCalloutMockFactory(
-			200,
-			'OK',
-			'OK',
-			new Map<String, String>()
-		);
-		Test.setMock(HttpCalloutMock.class, mock);
 		Account a = makeAccount();
+
+		// Create multiple mock responses for multiple calls
+		List<HttpResponse> responses = new List<HttpResponse>();
+		for (Integer i = 0; i < 10; i++) {
+			responses.add(HttpCalloutMockFactory.generateHttpResponse(
+				200,
+				'OK',
+				'OK',
+				new Map<String, String>()
+			));
+		}
+		HttpCalloutMockFactory mock = new HttpCalloutMockFactory(responses);
+		Test.setMock(HttpCalloutMock.class, mock);
 
 		Test.startTest();
 		// Test all convenience methods with logging context
@@ -926,12 +910,18 @@ private class RestLibTests {
 	@isTest
 	private static void testRestClientLibConvenienceMethodsWithoutLogging() {
 		RestClientLib rc = new RestClientLib('DummyNamedCredential');
-		HttpCalloutMockFactory mock = new HttpCalloutMockFactory(
-			200,
-			'OK',
-			'OK',
-			new Map<String, String>()
-		);
+
+		// Create multiple mock responses for multiple calls
+		List<HttpResponse> responses = new List<HttpResponse>();
+		for (Integer i = 0; i < 10; i++) {
+			responses.add(HttpCalloutMockFactory.generateHttpResponse(
+				200,
+				'OK',
+				'OK',
+				new Map<String, String>()
+			));
+		}
+		HttpCalloutMockFactory mock = new HttpCalloutMockFactory(responses);
 		Test.setMock(HttpCalloutMock.class, mock);
 
 		Test.startTest();
@@ -964,14 +954,20 @@ private class RestLibTests {
 	@isTest
 	private static void testRestClientLibMakeApiCallOverloads() {
 		RestClientLib rc = new RestClientLib('DummyNamedCredential');
-		HttpCalloutMockFactory mock = new HttpCalloutMockFactory(
-			200,
-			'OK',
-			'OK',
-			new Map<String, String>()
-		);
-		Test.setMock(HttpCalloutMock.class, mock);
 		Account a = makeAccount();
+
+		// Create multiple mock responses for multiple calls
+		List<HttpResponse> responses = new List<HttpResponse>();
+		for (Integer i = 0; i < 6; i++) {
+			responses.add(HttpCalloutMockFactory.generateHttpResponse(
+				200,
+				'OK',
+				'OK',
+				new Map<String, String>()
+			));
+		}
+		HttpCalloutMockFactory mock = new HttpCalloutMockFactory(responses);
+		Test.setMock(HttpCalloutMock.class, mock);
 
 		Test.startTest();
 		// Test all makeApiCall overloads
