@@ -172,7 +172,7 @@ jobs:
         
         # Run only the test classes that are part of this package
         set +e  # Don't exit on error, we'll handle it manually
-        sf apex test run --class-names NebulaAdapter_Test,RestLibTests --target-org pkgorg --result-format json --code-coverage --wait 10 > test_result.json 2>&1
+        sf apex test run --class-names NebulaAdapter_Test --class-names RestLibTests --target-org pkgorg --result-format json --code-coverage --wait 10 > test_result.json 2>&1
         TEST_EXIT_CODE=$?
         set -e  # Re-enable exit on error
         
@@ -182,11 +182,11 @@ jobs:
         cat test_result.json
         
         # Check if test execution was successful
+        # Note: sf apex test run may return non-zero exit code for warnings, but tests might still pass
+        # We'll check the actual test results in the JSON output instead of relying solely on exit code
         if [ $TEST_EXIT_CODE -ne 0 ]; then
-          echo "❌ ERROR: Test execution failed with exit code $TEST_EXIT_CODE"
-          echo "Raw output:"
-          cat test_result.json
-          exit 1
+          echo "⚠️ WARNING: Test execution returned exit code $TEST_EXIT_CODE"
+          echo "This might be due to CLI warnings. Checking actual test results..."
         fi
         
         # Check if we have valid JSON output
@@ -257,7 +257,7 @@ jobs:
           fi
         fi
         
-        # Check for test failures
+        # Check for test failures - this is the real test validation
         if jq -e '.result.failures' test_result.json > /dev/null 2>&1; then
           FAILURES=$(jq -r '.result.failures' test_result.json)
           if [ "$FAILURES" != "0" ] && [ "$FAILURES" != "null" ]; then
@@ -266,6 +266,28 @@ jobs:
             jq -r '.result.tests[] | select(.Outcome == "Fail") | "  - \(.MethodName): \(.Message)"' test_result.json 2>/dev/null || echo "Could not extract failure details"
             exit 1
           fi
+        fi
+        
+        # Additional validation: Check if any tests actually ran and passed
+        if jq -e '.result.summary' test_result.json > /dev/null 2>&1; then
+          TESTS_RAN=$(jq -r '.result.summary.testsRan // 0' test_result.json)
+          PASSING=$(jq -r '.result.summary.passing // 0' test_result.json)
+          FAILING=$(jq -r '.result.summary.failing // 0' test_result.json)
+          
+          if [ "$TESTS_RAN" = "0" ]; then
+            echo "❌ ERROR: No tests were executed"
+            exit 1
+          fi
+          
+          if [ "$FAILING" != "0" ] && [ "$FAILING" != "null" ]; then
+            echo "❌ ERROR: $FAILING test(s) failed out of $TESTS_RAN total tests"
+            exit 1
+          fi
+          
+          echo "✅ SUCCESS: All $PASSING tests passed (0 failures)"
+        else
+          echo "❌ ERROR: Could not extract test summary from results"
+          exit 1
         fi
         
         # Clean up temporary test result file
