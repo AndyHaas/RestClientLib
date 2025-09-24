@@ -4,17 +4,62 @@ A comprehensive Salesforce Apex library that provides a clean, type-safe, and ex
 
 ## Latest Release
 <!--LATEST-RELEASE-START-->
-**Version:** 1.0.4  
-**Tag:** v1.0.4  
+<!--LATEST-RELEASE-START-->
+**Version:** 1.0.6  
+**Tag:** v1.0.6  
 **Release Type:** stable  
-**Package Version ID:** 04tQm000002z5mPIAQ  
-**Package:** [REST-API-Library-v1.0.4.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.4/REST-API-Library-v1.0.4.zip)  
-**Release Date:** 2025-09-24
+**Package Version ID:** 04tQm000002z8qjIAA  
+**Package:** [REST-API-Library-v1.0.6.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.6/REST-API-Library-v1.0.6.zip)  
+**Release Date:** 2025-09-24  
 
 ### Quick Install
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ)
-- **CLI:** `sf package install --package 04tQm000002z5mPIAQ --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **CLI:** `sf package install --package 04tQm000002z8qjIAA --wait 10 --installation-key-bypass`
+
+<details><summary>Change summary</summary>
+
+**Package Version ID:** 04tQm000002z8qjIAA
+
+### Installation
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **CLI:** `sf package install --package 04tQm000002z8qjIAA --wait 10 --installation-key-bypass`
+
+### Changes
+- docs: update README for v1.0.5-beta (bdfd706) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.5-beta...v1.0.6)
+</details>
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-START-->
+<!--LATEST-RELEASE-START-->
+**Version:** 1.0.6  
+**Tag:** v1.0.6  
+**Release Type:** stable  
+**Package Version ID:** 04tQm000002z8qjIAA  
+**Package:** [REST-API-Library-v1.0.6.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.6/REST-API-Library-v1.0.6.zip)  
+**Release Date:** 2025-09-24  
+
+### Quick Install
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **CLI:** `sf package install --package 04tQm000002z8qjIAA --wait 10 --installation-key-bypass`
+
+<details><summary>Change summary</summary>
+
+**Package Version ID:** 04tQm000002z8qjIAA
+
+### Installation
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **CLI:** `sf package install --package 04tQm000002z8qjIAA --wait 10 --installation-key-bypass`
+
+### Changes
+- docs: update README for v1.0.5-beta (bdfd706) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.5-beta...v1.0.6)
+</details>
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-END-->
 
 ## What RestClientLib Does
