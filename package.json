@@ -1,7 +1,7 @@
 {
   "name": "restclientlib",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5-beta",
   "description": "A comprehensive Salesforce Apex library for making REST API callouts",
   "scripts": {
     "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
