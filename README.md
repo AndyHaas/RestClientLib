@@ -4,6 +4,17 @@ A comprehensive Salesforce Apex library that provides a clean, type-safe, and ex
 
 ## Latest Release
 <!--LATEST-RELEASE-START-->
+**Version:** 1.0.4  
+**Tag:** v1.0.4  
+**Release Type:** stable  
+**Package Version ID:** 04tQm000002z5mPIAQ  
+**Package:** [REST-API-Library-v1.0.4.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.4/REST-API-Library-v1.0.4.zip)  
+**Release Date:** 2025-01-24  
+
+### 🚀 Quick Install
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ)
+- **CLI:** `sf package install --package 04tQm000002z5mPIAQ --wait 10 --installation-key-bypass`
 <!--LATEST-RELEASE-END-->
 
 ## What RestClientLib Does
