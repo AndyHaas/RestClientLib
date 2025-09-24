@@ -3,7 +3,6 @@
 A comprehensive Salesforce Apex library that provides a clean, type-safe, and extensible framework for making REST API callouts. Built with enterprise security and developer productivity in mind, RestClientLib eliminates the complexity of HTTP callouts while providing powerful features like async processing, comprehensive testing utilities, and fluent API design.
 
 ## Latest Release
-## Latest Release
 <!--LATEST-RELEASE-START-->
 <!--LATEST-RELEASE-END-->
 
