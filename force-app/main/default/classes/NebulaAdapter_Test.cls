@@ -1,17 +1,18 @@
 @IsTest
 private class NebulaAdapter_Test {
-    // Mock that extends HttpCalloutMockFactory to capture the last request for assertions
-    public class RequestCapturingMock extends HttpCalloutMockFactory {
+    // Mock that implements HttpCalloutMock and uses HttpCalloutMockFactory for response generation
+    public class RequestCapturingMock implements HttpCalloutMock {
         public static HttpRequest lastRequest;
+        private HttpResponse mockResponse;
 
         @SuppressWarnings('PMD.ExcessiveParameterList')
         public RequestCapturingMock(Integer code, String status, String bodyAsString, Map<String, String> headers) {
-            super(code, status, bodyAsString, headers);
+            this.mockResponse = HttpCalloutMockFactory.generateHttpResponse(code, status, bodyAsString, headers);
         }
 
-        public override HttpResponse respond(HttpRequest req) {
+        public HttpResponse respond(HttpRequest req) {
             lastRequest = req;
-            return super.respond(req);
+            return mockResponse;
         }
     }
 
