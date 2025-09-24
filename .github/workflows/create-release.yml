@@ -427,7 +427,7 @@ jobs:
           if [ "${{ steps.version.outputs.release_type }}" == "latest" ]; then
             echo "🚀 Promoting package version to released status..."
             PROMOTE_OUTPUT=$(sf package version promote \
-              --package "$SF_PACKAGE1_ID@$PACKAGE_VERSION_ID" \
+              --package "$PACKAGE_VERSION_ID" \
               --target-dev-hub pkgorg \
               --json 2>&1)
             PROMOTE_EXIT_CODE=$?
