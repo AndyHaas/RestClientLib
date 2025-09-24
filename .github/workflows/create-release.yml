@@ -390,13 +390,14 @@ jobs:
         
         # Create a new package version
         echo "Creating package version for package: $SF_PACKAGE1_ID"
-        echo "Command: sf package version create --package '$SF_PACKAGE1_ID' --installation-key-bypass --wait 10 --target-dev-hub pkgorg --json"
+        echo "Command: sf package version create --package '$SF_PACKAGE1_ID' --installation-key-bypass --code-coverage --wait 10 --target-dev-hub pkgorg --json"
         
         # Run the command and capture both output and exit code
         set +e  # Don't exit on error, we'll handle it manually
         PACKAGE_VERSION_OUTPUT=$(sf package version create \
           --package "$SF_PACKAGE1_ID" \
           --installation-key-bypass \
+          --code-coverage \
           --wait 10 \
           --target-dev-hub pkgorg \
           --json 2>&1)
