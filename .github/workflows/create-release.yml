@@ -1,4 +1,4 @@
-name: Build & Bump
+name: Create Release
 
 on:
   workflow_dispatch:
@@ -382,7 +382,7 @@ jobs:
 
     - name: Summary
       run: |
-        echo "## Build Completed Successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "## Release Created Successfully!" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Version:** ${{ steps.version.outputs.new }}" >> $GITHUB_STEP_SUMMARY
         echo "**Previous Version:** ${{ steps.version.outputs.current }}" >> $GITHUB_STEP_SUMMARY
