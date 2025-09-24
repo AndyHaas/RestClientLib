@@ -5,65 +5,60 @@ A comprehensive Salesforce Apex library that provides a clean, type-safe, and ex
 ## Latest Release
 <!--LATEST-RELEASE-START-->
 <!--LATEST-RELEASE-START-->
-**Version:** 1.0.5-beta  
-**Tag:** v1.0.5-beta  
-**Release Type:** beta  
-**Package Version ID:** 04tQm000002z8fRIAQ  
-**Package:** [REST-API-Library-v1.0.5-beta.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.5-beta/REST-API-Library-v1.0.5-beta.zip)  
+**Version:** 1.0.6  
+**Tag:** v1.0.6  
+**Release Type:** stable  
+**Package Version ID:** 04tQm000002z8qjIAA  
+**Package:** [REST-API-Library-v1.0.6.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.6/REST-API-Library-v1.0.6.zip)  
 **Release Date:** 2025-09-24  
 
 ### Quick Install
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8fRIAQ](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8fRIAQ)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8fRIAQ](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8fRIAQ)
-- **CLI:** `sf package install --package 04tQm000002z8fRIAQ --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **CLI:** `sf package install --package 04tQm000002z8qjIAA --wait 10 --installation-key-bypass`
 
 <details><summary>Change summary</summary>
 
-**Package Version ID:** 04tQm000002z8fRIAQ
+**Package Version ID:** 04tQm000002z8qjIAA
 
 ### Installation
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8fRIAQ](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8fRIAQ)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8fRIAQ](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8fRIAQ)
-- **CLI:** `sf package install --package 04tQm000002z8fRIAQ --wait 10 --installation-key-bypass`
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **CLI:** `sf package install --package 04tQm000002z8qjIAA --wait 10 --installation-key-bypass`
 
 ### Changes
-- fix: handle beta version suffixes in sfdx-project.json versionNumber (f7eaef7) — Andy Haas
-- fix: improve error handling and debugging for test execution (bac84da) — Andy Haas
-- fix: update GitHub workflow to handle CLI warnings and validate test results properly (17c4411) — Andy Haas
-- Merge pull request #3 from AndyHaas/feature/nebula-adapter-integration (72b3cdb) — Andy H
-- fix: remove second PATCH test method (7ebcb12) — Andy Haas
-- temp: remove problematic PATCH test to unblock workflow (334030c) — Andy Haas
-- fix: resolve PATCH method query parameter issue (1da1d8a) — Andy Haas
-- fix: resolve final test failures (a4e24ce) — Andy Haas
-- fix: resolve test failures and null pointer exceptions (784c4de) — Andy Haas
-- fix: add missing makeAccount helper method to RestLibTests (6f9f63d) — Andy Haas
-- fix: reorder workflow steps to deploy before testing (dbe7fa1) — Andy Haas
-- Merge pull request #2 from AndyHaas/feature/nebula-adapter-integration (45d5915) — Andy H
-- fix: improve test coverage and fix workflow test result parsing (0cd7ff8) — Andy Haas
-- feat: add comprehensive test coverage for RestLibApiCall (4961b62) — Andy Haas
-- feat: enhance coverage failure error messaging (fc71417) — Andy Haas
-- fix: improve test output handling and coverage extraction (3c4c36b) — Andy Haas
-- feat: enhance error handling and debugging in release workflow (3c4bc33) — Andy Haas
-- refactor: improve release workflow order of operations (45a5c78) — Andy Haas
-- Fix DELETE request body assertion in NebulaAdapter_Test (396fa73) — Andy Haas
-- feat: Add code coverage validation to release workflow (b5add48) — Andy Haas
-- fix: Change lastRequest from static to instance variable (edf5941) — Andy Haas
-- fix: Correct RequestCapturingMock implementation (040c4e9) — Andy Haas
-- fix: Update NebulaAdapter_Test to use HttpCalloutMockFactory and fix assertion messages (837b776) — Andy Haas
-- Merge pull request #1 from AndyHaas/feature/nebula-adapter-integration (ffa6377) — Andy H
-- feat: Add NebulaAdapter integration for enhanced API call logging (cb1553e) — Andy Haas
-- Update release date in README.md (ce56f5f) — Andy H
-- Update README.md (1b2d51e) — Andy H
-- refactor: rename workflow to better reflect its purpose (44be957) — Andy Haas
-- refactor: remove all emojis from workflow and README (361fe9d) — Andy Haas
-- fix: restore v1.0.4 release details in README (2374e6b) — Andy Haas
-- fix: remove duplicate Latest Release header (b00420f) — Andy Haas
-- fix: ensure README only shows latest release (5c146e5) — Andy Haas
-- fix: clean up README duplication and remove extra text (5b4184f) — Andy Haas
-- refactor: remove redundant publish-release workflow and clean up permissions (86e937b) — Andy Haas
-- docs: update README for v1.0.4 (66e9f91) — github-actions
-[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.4...v1.0.5-beta)
+- docs: update README for v1.0.5-beta (bdfd706) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.5-beta...v1.0.6)
 </details>
+<!--LATEST-RELEASE-END-->
+<!--LATEST-RELEASE-START-->
+<!--LATEST-RELEASE-START-->
+**Version:** 1.0.6  
+**Tag:** v1.0.6  
+**Release Type:** stable  
+**Package Version ID:** 04tQm000002z8qjIAA  
+**Package:** [REST-API-Library-v1.0.6.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.6/REST-API-Library-v1.0.6.zip)  
+**Release Date:** 2025-09-24  
+
+### Quick Install
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **CLI:** `sf package install --package 04tQm000002z8qjIAA --wait 10 --installation-key-bypass`
+
+<details><summary>Change summary</summary>
+
+**Package Version ID:** 04tQm000002z8qjIAA
+
+### Installation
+- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z8qjIAA)
+- **CLI:** `sf package install --package 04tQm000002z8qjIAA --wait 10 --installation-key-bypass`
+
+### Changes
+- docs: update README for v1.0.5-beta (bdfd706) — github-actions
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.5-beta...v1.0.6)
+</details>
+<!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-END-->
 
