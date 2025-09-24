@@ -2,6 +2,11 @@
 
 A comprehensive Salesforce Apex library for making REST API callouts with ease, security, and reliability. This package provides a robust foundation for building REST integrations in Salesforce with built-in support for Named Credentials, async processing, and comprehensive testing utilities.
 
+## Latest Release
+<!--LATEST-RELEASE-START-->
+_No release yet_
+<!--LATEST-RELEASE-END-->
+
 ## Features
 
 - **Named Credential Integration**: Secure API callouts using Salesforce Named Credentials

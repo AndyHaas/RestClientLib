@@ -100,6 +100,39 @@ jobs:
         sed -i "s/PACKAGE_VERSION=\".*\"/PACKAGE_VERSION=\"$NEW_VERSION\"/" scripts/create-package.sh
         echo "Updated create-package.sh version to $NEW_VERSION"
     
+    - name: Update README with latest release info
+      run: |
+        NEW_VERSION="${{ steps.new_version.outputs.new_version }}"
+        CURRENT_VERSION="${{ steps.current_version.outputs.current_version }}"
+        
+        # Create the release info content
+        cat > /tmp/release_info.md << EOF
+        **Version:** $NEW_VERSION  
+        **Previous Version:** $CURRENT_VERSION  
+        **Release Date:** $(date -u +"%Y-%m-%d")  
+        **Download:** [REST-API-Library-v$NEW_VERSION.zip](https://github.com/${{ github.repository }}/releases/download/v$NEW_VERSION/REST-API-Library-v$NEW_VERSION.zip)  
+        **Changelog:** [View Release Notes](https://github.com/${{ github.repository }}/releases/tag/v$NEW_VERSION)
+        EOF
+        
+        # Update the README between the markers
+        awk -v new_content="$(cat /tmp/release_info.md)" '
+        /<!--LATEST-RELEASE-START-->/,/<!--LATEST-RELEASE-END-->/ {
+          if (/<!--LATEST-RELEASE-START-->/) {
+            print $0
+            print new_content
+            next
+          }
+          if (/<!--LATEST-RELEASE-END-->/) {
+            print $0
+            next
+          }
+          next
+        }
+        { print }
+        ' README.md > README.md.tmp && mv README.md.tmp README.md
+        
+        echo "Updated README.md with latest release information"
+    
     - name: Create package
       run: |
         chmod +x scripts/create-package.sh
