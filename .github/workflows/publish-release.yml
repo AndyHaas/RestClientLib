@@ -27,7 +27,7 @@ jobs:
       id: meta
       run: |
         ls -R artifacts
-        VERSION=$(cat artifacts/**/VERSION | tr -d '\n')
+        VERSION=$(node -p "require('./artifacts/**/package.json').version" | head -1)
         TAG="v$VERSION"
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "tag=$TAG" >> $GITHUB_OUTPUT

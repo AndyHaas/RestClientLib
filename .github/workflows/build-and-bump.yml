@@ -59,13 +59,8 @@ jobs:
     - name: Read and calculate version
       id: version
       run: |
-        # Read current version from VERSION file
-        if [ -f VERSION ]; then
-          CUR=$(cat VERSION | tr -d '\n')
-        else
-          CUR="1.0.0"
-          echo "$CUR" > VERSION
-        fi
+        # Read current version from package.json
+        CUR=$(node -p "require('./package.json').version")
         
         MAJOR=$(echo "$CUR" | cut -d. -f1)
         MINOR=$(echo "$CUR" | cut -d. -f2)
@@ -83,7 +78,6 @@ jobs:
           NEW="$MAJOR.$MINOR.$PATCH"
         fi
         
-        echo "$NEW" > VERSION
         echo "current=$CUR" >> $GITHUB_OUTPUT
         echo "new=$NEW" >> $GITHUB_OUTPUT
         echo "tag=v$NEW" >> $GITHUB_OUTPUT
@@ -184,7 +178,7 @@ jobs:
         GIT_COMMITTER_EMAIL: github-actions@users.noreply.github.com
       run: |
         set -e
-        git add VERSION package.json manifest/package.xml sfdx-project.json
+        git add package.json manifest/package.xml sfdx-project.json
         if ! git diff --quiet --staged; then
           git commit -m "chore(release): bump version to ${{ steps.version.outputs.new }}"
         fi
@@ -199,7 +193,6 @@ jobs:
         path: |
           REST-API-Library-v${{ steps.version.outputs.new }}.zip
           release_notes.md
-          VERSION
         retention-days: 30
     
     - name: Summary
