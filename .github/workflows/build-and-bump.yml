@@ -38,7 +38,10 @@ jobs:
       run: npm install
     
     - name: Install Salesforce CLI
-      uses: salesforcecli/github-action@v2
+      run: |
+        npm install -g @salesforce/cli
+        echo "$(npm config get prefix)/bin" >> $GITHUB_PATH
+        sf --version
     
     - name: Auth via JWT (packaging org)
       env:
