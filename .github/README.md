@@ -4,9 +4,9 @@ This repository includes automated workflows for package creation and release ma
 
 ## Available Workflows
 
-### 1. Create Release Package (`release.yml`)
+### 1. Build & Bump (`build-and-bump.yml`)
 
-**Purpose**: Creates a full release with semantic versioning and GitHub release
+**Purpose**: Main workflow that handles version bumping, package creation, and Salesforce deployment
 
 **Trigger**: Manual (workflow_dispatch)
 
@@ -16,39 +16,33 @@ This repository includes automated workflows for package creation and release ma
 
 **What it does**:
 - Calculates new version based on current version and release type
-- Updates `package.json`, `package.xml`, and script versions
+- Updates `package.json`, `package.xml`, `sfdx-project.json`, and script versions
 - Creates the package zip file
-- Creates a GitHub release with download link
+- Converts source to MDAPI format
+- Deploys to Salesforce packaging org
 - Commits version changes back to the repository
-- Uploads package as release asset
+- Triggers the Publish Release workflow automatically
 
 **How to use**:
 1. Go to Actions tab in GitHub
-2. Select "Create Release Package"
+2. Select "Build & Bump"
 3. Click "Run workflow"
 4. Choose release type or enter custom version
 5. Click "Run workflow"
 
-### 2. Create Package (No Release) (`create-package.yml`)
+### 2. Publish Release (`publish-release.yml`)
 
-**Purpose**: Creates a package zip file without creating a release
+**Purpose**: Creates GitHub releases and updates documentation after successful build
 
-**Trigger**: Manual (workflow_dispatch)
-
-**Options**:
-- **Version**: Specify the package version
+**Trigger**: Automatic (runs after Build & Bump completes successfully)
 
 **What it does**:
-- Creates package zip file with specified version
-- Uploads as GitHub artifact (available for 7 days)
-- No release or version commits
+- Downloads artifacts from the Build & Bump workflow
+- Creates GitHub release with download links
+- Updates README.md with latest release information
+- Uploads package as release asset
 
-**How to use**:
-1. Go to Actions tab in GitHub
-2. Select "Create Package (No Release)"
-3. Click "Run workflow"
-4. Enter desired version
-5. Click "Run workflow"
+**Note**: This workflow runs automatically after Build & Bump completes successfully.
 
 ## Local Development
 
