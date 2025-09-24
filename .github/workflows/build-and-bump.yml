@@ -350,12 +350,12 @@ jobs:
           echo "<!--LATEST-RELEASE-END-->"
         } > latest_block.md
 
-        # Update README with the new block
+        # Update README with the new block (replace entire section)
         awk '
-          BEGIN{printing=1}
-          /<!--LATEST-RELEASE-START-->/ {print; system("cat latest_block.md"); printing=0; next}
-          /<!--LATEST-RELEASE-END-->/ {print; printing=1; next}
-          printing==1 {print}
+          BEGIN{printing=1; in_section=0}
+          /<!--LATEST-RELEASE-START-->/ {print; system("cat latest_block.md"); printing=0; in_section=1; next}
+          /<!--LATEST-RELEASE-END-->/ {print; printing=1; in_section=0; next}
+          in_section==0 && printing==1 {print}
         ' README.md > README.md.new
 
         mv README.md.new README.md
