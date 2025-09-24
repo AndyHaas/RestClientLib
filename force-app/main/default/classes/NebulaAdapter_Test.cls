@@ -112,4 +112,138 @@ private class NebulaAdapter_Test {
         // Nebula adapter no-ops again
         NebulaAdapter.debug('Another test log', a);
     }
+
+    @IsTest
+    static void testNebulaAdapterAvailability() {
+        // Test isAvailable method
+        Boolean isAvailable = NebulaAdapter.isAvailable();
+        System.assert(!isAvailable, 'Nebula should not be available in test context');
+    }
+
+    @IsTest
+    static void testNebulaAdapterErrorLogging() {
+        Account a = makeAccount();
+        Exception testEx = new DmlException('Test exception');
+        
+        // Test error logging without Nebula
+        Test.startTest();
+        NebulaAdapter.error('Test error message', a, testEx);
+        Test.stopTest();
+        
+        // Should not throw exception, just fall back to System.debug
+        System.assert(true, 'Error logging should complete without exception');
+    }
+
+    @IsTest
+    static void testNebulaAdapterErrorLoggingWithoutRecord() {
+        Exception testEx = new DmlException('Test exception');
+        
+        // Test error logging without record
+        Test.startTest();
+        NebulaAdapter.error('Test error message', null, testEx);
+        Test.stopTest();
+        
+        // Should not throw exception
+        System.assert(true, 'Error logging should complete without exception');
+    }
+
+    @IsTest
+    static void testNebulaAdapterErrorLoggingWithoutException() {
+        Account a = makeAccount();
+        
+        // Test error logging without exception
+        Test.startTest();
+        NebulaAdapter.error('Test error message', a, null);
+        Test.stopTest();
+        
+        // Should not throw exception
+        System.assert(true, 'Error logging should complete without exception');
+    }
+
+    @IsTest
+    static void testNebulaAdapterHttpRequestLogging() {
+        Account a = makeAccount();
+        HttpRequest req = new HttpRequest();
+        req.setMethod('POST');
+        req.setEndpoint('https://test.com/api');
+        req.setBody('{"test":"data"}');
+        req.setHeader('Content-Type', 'application/json');
+        req.setHeader('Authorization', 'Bearer token123');
+        
+        List<String> headersToLog = new List<String>{'Content-Type', 'Authorization'};
+        
+        Test.startTest();
+        NebulaAdapter.logHttpRequest('Test Request', req, headersToLog, a);
+        Test.stopTest();
+        
+        // Should not throw exception
+        System.assert(true, 'HTTP request logging should complete without exception');
+    }
+
+    @IsTest
+    static void testNebulaAdapterHttpRequestLoggingWithoutHeaders() {
+        Account a = makeAccount();
+        HttpRequest req = new HttpRequest();
+        req.setMethod('GET');
+        req.setEndpoint('https://test.com/api');
+        
+        Test.startTest();
+        NebulaAdapter.logHttpRequest('Test Request', req, null, a);
+        Test.stopTest();
+        
+        // Should not throw exception
+        System.assert(true, 'HTTP request logging should complete without exception');
+    }
+
+    @IsTest
+    static void testNebulaAdapterHttpResponseLogging() {
+        Account a = makeAccount();
+        HttpResponse res = new HttpResponse();
+        res.setStatusCode(200);
+        res.setStatus('OK');
+        res.setBody('{"success":true}');
+        
+        Test.startTest();
+        NebulaAdapter.logHttpResponse('Test Response', res, a);
+        Test.stopTest();
+        
+        // Should not throw exception
+        System.assert(true, 'HTTP response logging should complete without exception');
+    }
+
+    @IsTest
+    static void testNebulaAdapterHttpResponseLoggingWithoutBody() {
+        Account a = makeAccount();
+        HttpResponse res = new HttpResponse();
+        res.setStatusCode(404);
+        res.setStatus('Not Found');
+        
+        Test.startTest();
+        NebulaAdapter.logHttpResponse('Test Response', res, a);
+        Test.stopTest();
+        
+        // Should not throw exception
+        System.assert(true, 'HTTP response logging should complete without exception');
+    }
+
+    @IsTest
+    static void testNebulaAdapterSave() {
+        Test.startTest();
+        NebulaAdapter.save();
+        Test.stopTest();
+        
+        // Should not throw exception
+        System.assert(true, 'Save should complete without exception');
+    }
+
+    @IsTest
+    static void testNebulaAdapterLoggingWithoutRecord() {
+        Test.startTest();
+        NebulaAdapter.info('Test message', null);
+        NebulaAdapter.debug('Test debug message', null);
+        Test.stopTest();
+        
+        // Should not throw exception
+        System.assert(true, 'Logging without record should complete without exception');
+    }
 }

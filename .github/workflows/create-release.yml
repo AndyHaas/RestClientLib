@@ -149,50 +149,52 @@ jobs:
         
         # Run only the test classes that are part of this package
         set +e  # Don't exit on error, we'll handle it manually
-        TEST_RESULT=$(sf apex test run --class-names NebulaAdapter_Test,RestLibTests --target-org pkgorg --result-format json --code-coverage --wait 10 2>&1)
+        sf apex test run --class-names NebulaAdapter_Test,RestLibTests --target-org pkgorg --result-format json --code-coverage --wait 10 > test_result.json 2>&1
         TEST_EXIT_CODE=$?
         set -e  # Re-enable exit on error
         
         echo "Test execution exit code: $TEST_EXIT_CODE"
         echo "Test execution output:"
-        # Use cat instead of echo to avoid broken pipe issues with large JSON
-        echo "$TEST_RESULT" | jq '.' 2>/dev/null || echo "$TEST_RESULT" | cat
+        # Read from file to avoid broken pipe issues
+        cat test_result.json
         
         # Check if test execution was successful
         if [ $TEST_EXIT_CODE -ne 0 ]; then
           echo "❌ ERROR: Test execution failed with exit code $TEST_EXIT_CODE"
-          echo "Raw output: $TEST_RESULT"
+          echo "Raw output:"
+          cat test_result.json
           exit 1
         fi
         
         # Check if we have valid JSON output
-        if ! echo "$TEST_RESULT" | jq -e '.result' > /dev/null 2>&1; then
+        if ! jq -e '.result' test_result.json > /dev/null 2>&1; then
           echo "❌ ERROR: Invalid test result format"
-          echo "Raw output: $TEST_RESULT"
+          echo "Raw output:"
+          cat test_result.json
           exit 1
         fi
         
         # Extract test summary
-        if echo "$TEST_RESULT" | jq -e '.result.summary' > /dev/null 2>&1; then
-          SUMMARY=$(echo "$TEST_RESULT" | jq -r '.result.summary')
+        if jq -e '.result.summary' test_result.json > /dev/null 2>&1; then
+          SUMMARY=$(jq -r '.result.summary' test_result.json)
           echo "Test Summary: $SUMMARY"
           
           # Show detailed test counts
-          PASSING=$(echo "$TEST_RESULT" | jq -r '.result.summary.passing // 0')
-          FAILING=$(echo "$TEST_RESULT" | jq -r '.result.summary.failing // 0')
-          SKIPPED=$(echo "$TEST_RESULT" | jq -r '.result.summary.skipped // 0')
-          TESTS_RAN=$(echo "$TEST_RESULT" | jq -r '.result.summary.testsRan // 0')
+          PASSING=$(jq -r '.result.summary.passing // 0' test_result.json)
+          FAILING=$(jq -r '.result.summary.failing // 0' test_result.json)
+          SKIPPED=$(jq -r '.result.summary.skipped // 0' test_result.json)
+          TESTS_RAN=$(jq -r '.result.summary.testsRan // 0' test_result.json)
           
           echo "📈 Test Results: $PASSING passed, $FAILING failed, $SKIPPED skipped (Total: $TESTS_RAN)"
         fi
         
         # Extract coverage percentage - try multiple possible locations in the JSON
         COVERAGE=""
-        if echo "$TEST_RESULT" | jq -e '.result.summary.testRunCoverage' > /dev/null 2>&1; then
-          COVERAGE=$(echo "$TEST_RESULT" | jq -r '.result.summary.testRunCoverage' | sed 's/%//')
+        if jq -e '.result.summary.testRunCoverage' test_result.json > /dev/null 2>&1; then
+          COVERAGE=$(jq -r '.result.summary.testRunCoverage' test_result.json | sed 's/%//')
           echo "Code coverage (test run): $COVERAGE%"
-        elif echo "$TEST_RESULT" | jq -e '.result.coverage.coverage' > /dev/null 2>&1; then
-          COVERAGE=$(echo "$TEST_RESULT" | jq -r '.result.coverage.coverage[].percent')
+        elif jq -e '.result.coverage.coverage' test_result.json > /dev/null 2>&1; then
+          COVERAGE=$(jq -r '.result.coverage.coverage[].percent' test_result.json)
           echo "Code coverage (per class): $COVERAGE%"
         else
           echo "⚠️ WARNING: Could not extract coverage information from test results"
@@ -233,15 +235,18 @@ jobs:
         fi
         
         # Check for test failures
-        if echo "$TEST_RESULT" | jq -e '.result.failures' > /dev/null 2>&1; then
-          FAILURES=$(echo "$TEST_RESULT" | jq -r '.result.failures')
+        if jq -e '.result.failures' test_result.json > /dev/null 2>&1; then
+          FAILURES=$(jq -r '.result.failures' test_result.json)
           if [ "$FAILURES" != "0" ] && [ "$FAILURES" != "null" ]; then
             echo "❌ ERROR: $FAILURES test(s) failed"
             echo "Test failures details:"
-            echo "$TEST_RESULT" | jq -r '.result.tests[] | select(.Outcome == "Fail") | "  - \(.MethodName): \(.Message)"' 2>/dev/null || echo "Could not extract failure details"
+            jq -r '.result.tests[] | select(.Outcome == "Fail") | "  - \(.MethodName): \(.Message)"' test_result.json 2>/dev/null || echo "Could not extract failure details"
             exit 1
           fi
         fi
+        
+        # Clean up temporary test result file
+        rm -f test_result.json
 
     - name: Deploy to packaging org
       run: |
