@@ -37,6 +37,23 @@ jobs:
     - name: Install dependencies
       run: npm install
     
+    - name: Install Salesforce CLI
+      uses: salesforcecli/github-action@v2
+    
+    - name: Auth via JWT (packaging org)
+      env:
+        SFDX_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}
+        SFDX_JWT_KEY: ${{ secrets.SF_JWT_KEY }}
+        SF_USERNAME: ${{ secrets.SF_PACKAGING_USERNAME }}
+      run: |
+        echo "$SFDX_JWT_KEY" > server.key
+        sf org login jwt \
+          --client-id "$SFDX_CLIENT_ID" \
+          --jwt-key-file server.key \
+          --username "$SF_USERNAME" \
+          --alias pkgorg --set-default
+        rm -f server.key
+    
     - name: Read and calculate version
       id: version
       run: |
@@ -94,6 +111,14 @@ jobs:
       run: |
         chmod +x scripts/create-package.sh
         ./scripts/create-package.sh || echo "Package creation completed"
+    
+    - name: Convert to MDAPI
+      run: |
+        sf project convert source --root-dir force-app --output-dir mdapi_out
+    
+    - name: Deploy to packaging org
+      run: |
+        sf project deploy start --metadata-dir mdapi_out --target-org pkgorg --wait 60 --ignore-conflicts
     
     - name: Build changelog
       run: |
