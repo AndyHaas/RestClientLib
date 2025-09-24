@@ -155,7 +155,8 @@ jobs:
         
         echo "Test execution exit code: $TEST_EXIT_CODE"
         echo "Test execution output:"
-        echo "$TEST_RESULT" | jq '.' 2>/dev/null || echo "$TEST_RESULT"
+        # Use cat instead of echo to avoid broken pipe issues with large JSON
+        echo "$TEST_RESULT" | jq '.' 2>/dev/null || echo "$TEST_RESULT" | cat
         
         # Check if test execution was successful
         if [ $TEST_EXIT_CODE -ne 0 ]; then
@@ -177,12 +178,20 @@ jobs:
           echo "Test Summary: $SUMMARY"
         fi
         
-        # Extract coverage percentage
-        if echo "$TEST_RESULT" | jq -e '.result.coverage.coverage' > /dev/null 2>&1; then
+        # Extract coverage percentage - try multiple possible locations in the JSON
+        COVERAGE=""
+        if echo "$TEST_RESULT" | jq -e '.result.summary.testRunCoverage' > /dev/null 2>&1; then
+          COVERAGE=$(echo "$TEST_RESULT" | jq -r '.result.summary.testRunCoverage' | sed 's/%//')
+          echo "Code coverage (test run): $COVERAGE%"
+        elif echo "$TEST_RESULT" | jq -e '.result.coverage.coverage' > /dev/null 2>&1; then
           COVERAGE=$(echo "$TEST_RESULT" | jq -r '.result.coverage.coverage[].percent')
-          echo "Code coverage: $COVERAGE%"
-          
-          # Check if coverage meets minimum requirement (75%)
+          echo "Code coverage (per class): $COVERAGE%"
+        else
+          echo "⚠️ WARNING: Could not extract coverage information from test results"
+        fi
+        
+        # Check if coverage meets minimum requirement (75%)
+        if [ -n "$COVERAGE" ]; then
           MIN_COVERAGE=75
           if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
             echo "❌ ERROR: Code coverage $COVERAGE% is below minimum requirement of $MIN_COVERAGE%"
@@ -191,8 +200,6 @@ jobs:
           else
             echo "✅ SUCCESS: Code coverage $COVERAGE% meets minimum requirement of $MIN_COVERAGE%"
           fi
-        else
-          echo "⚠️ WARNING: Could not extract coverage information from test results"
         fi
         
         # Check for test failures
