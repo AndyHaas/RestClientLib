@@ -75,6 +75,15 @@ public class SlackApiClient extends RestClientLib {
     public HttpResponse updateUser(String userId, Map<String, Object> userData) {
         return patch('/api/users/' + userId, JSON.serialize(userData));
     }
+    
+    // Using the generic makeApiCall method for custom scenarios
+    public HttpResponse customRequest(String endpoint, Map<String, String> params) {
+        String queryString = '';
+        for (String key : params.keySet()) {
+            queryString += key + '=' + EncodingUtil.urlEncode(params.get(key), 'UTF-8') + '&';
+        }
+        return makeApiCall(HttpVerb.GET, endpoint, queryString.removeEnd('&'));
+    }
 }
 
 // Usage
@@ -154,6 +163,9 @@ System.enqueueJob(new AsyncRestClient(
 | `patch(String path, String query, String body)` | PATCH request with query and body | `path` - API endpoint path, `query` - Query string, `body` - Request body |
 | `del(String path)` | DELETE request | `path` - API endpoint path |
 | `del(String path, String query)` | DELETE request with query parameters | `path` - API endpoint path, `query` - Query string |
+| `makeApiCall(HttpVerb method, String path)` | Generic API call with method and path | `method` - HTTP verb, `path` - API endpoint path |
+| `makeApiCall(HttpVerb method, String path, String query)` | Generic API call with method, path, and query | `method` - HTTP verb, `path` - API endpoint path, `query` - Query string |
+| `makeApiCall(HttpVerb method, String path, String query, String body)` | Generic API call with all parameters | `method` - HTTP verb, `path` - API endpoint path, `query` - Query string, `body` - Request body |
 
 ### RestClient Static Methods
 
@@ -166,17 +178,26 @@ System.enqueueJob(new AsyncRestClient(
 | Method | Description | Returns |
 |--------|-------------|---------|
 | `create()` | Create new API call instance | `RestLibApiCall` |
+| `withMethod(HttpVerb method)` | Set HTTP method (generic) | `RestLibApiCall` |
 | `usingGet()` | Set HTTP method to GET | `RestLibApiCall` |
 | `usingPost()` | Set HTTP method to POST | `RestLibApiCall` |
 | `usingPut()` | Set HTTP method to PUT | `RestLibApiCall` |
 | `usingPatch()` | Set HTTP method to PATCH | `RestLibApiCall` |
 | `usingDelete()` | Set HTTP method to DELETE | `RestLibApiCall` |
+| `usingHead()` | Set HTTP method to HEAD | `RestLibApiCall` |
 | `withPath(String path)` | Set API endpoint path | `RestLibApiCall` |
 | `withQuery(String query)` | Set query parameters | `RestLibApiCall` |
 | `withBody(String body)` | Set request body | `RestLibApiCall` |
 | `withHeaders(Map<String,String> headers)` | Set custom headers | `RestLibApiCall` |
 | `withHeader(String key, String value)` | Add single header | `RestLibApiCall` |
 | `withTimeout(Integer timeout)` | Set timeout in milliseconds | `RestLibApiCall` |
+
+### RestLibApiCall Constructors
+
+| Constructor | Description | Parameters |
+|-------------|-------------|------------|
+| `RestLibApiCall(HttpVerb method, String path, String query, String body)` | Basic constructor with default headers | `method` - HTTP verb, `path` - API path, `query` - Query string, `body` - Request body |
+| `RestLibApiCall(HttpVerb method, String path, String query, String body, Map<String,String> headers)` | Full constructor with custom headers | `method` - HTTP verb, `path` - API path, `query` - Query string, `body` - Request body, `headers` - Custom headers |
 
 ### HttpVerb Enum
 
