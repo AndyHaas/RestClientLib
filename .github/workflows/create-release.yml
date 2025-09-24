@@ -111,11 +111,14 @@ jobs:
     - name: Update sfdx-project.json version
       run: |
         NEW_VERSION="${{ steps.version.outputs.new }}"
+        # Extract numeric version (remove beta suffix if present) for versionNumber
+        NUMERIC_VERSION=$(echo "$NEW_VERSION" | sed 's/-.*$//')
+        
         # Update versionName in sfdx-project.json
         sed -i "s/\"versionName\": \"ver [^\"]*\"/\"versionName\": \"ver $NEW_VERSION\"/" sfdx-project.json
         # Update versionNumber in sfdx-project.json (format: MAJOR.MINOR.PATCH.NEXT)
-        sed -i "s/\"versionNumber\": \"[^\"]*\"/\"versionNumber\": \"$NEW_VERSION.NEXT\"/" sfdx-project.json
-        echo "Updated sfdx-project.json version to $NEW_VERSION"
+        sed -i "s/\"versionNumber\": \"[^\"]*\"/\"versionNumber\": \"$NUMERIC_VERSION.NEXT\"/" sfdx-project.json
+        echo "Updated sfdx-project.json version to $NEW_VERSION (numeric: $NUMERIC_VERSION)"
     
     - name: Create package
       run: |
