@@ -172,9 +172,21 @@ jobs:
         
         # Run only the test classes that are part of this package
         set +e  # Don't exit on error, we'll handle it manually
-        sf apex test run --class-names NebulaAdapter_Test --class-names RestLibTests --target-org pkgorg --result-format json --code-coverage --wait 10 > test_result.json 2>&1
+        # Capture both stdout and stderr, but ignore warnings in stderr
+        sf apex test run --class-names NebulaAdapter_Test --class-names RestLibTests --target-org pkgorg --result-format json --code-coverage --wait 10 > test_result.json 2>test_errors.log
         TEST_EXIT_CODE=$?
         set -e  # Re-enable exit on error
+        
+        # Check if there were any real errors (not just warnings)
+        if [ -s test_errors.log ]; then
+          echo "🔍 Debug: Checking for errors vs warnings..."
+          cat test_errors.log
+          # If the only content is warnings about array format, we can ignore it
+          if grep -q "array arguments has changed" test_errors.log && ! grep -v "array arguments has changed\|Warning:" test_errors.log; then
+            echo "⚠️ WARNING: Only array format warnings detected, ignoring..."
+            TEST_EXIT_CODE=0  # Treat as success if only warnings
+          fi
+        fi
         
         echo "Test execution exit code: $TEST_EXIT_CODE"
         echo "Test execution output:"
@@ -190,11 +202,17 @@ jobs:
         fi
         
         # Check if we have valid JSON output
+        echo "🔍 Debug: Checking JSON validity..."
         if ! jq -e '.result' test_result.json > /dev/null 2>&1; then
           echo "❌ ERROR: Invalid test result format"
           echo "Raw output:"
           cat test_result.json
+          echo "🔍 Debug: jq command failed. Checking if jq is available..."
+          which jq || echo "jq not found in PATH"
+          jq --version || echo "jq version check failed"
           exit 1
+        else
+          echo "✅ JSON format is valid"
         fi
         
         # Extract test summary
@@ -290,8 +308,8 @@ jobs:
           exit 1
         fi
         
-        # Clean up temporary test result file
-        rm -f test_result.json
+        # Clean up temporary files
+        rm -f test_result.json test_errors.log
     
     - name: Create package and version
       id: package_version
