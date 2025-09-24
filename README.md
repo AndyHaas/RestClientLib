@@ -48,6 +48,9 @@ Send data to analytics platforms, business intelligence tools, or custom dashboa
 ### Microservices Communication
 Integrate with microservices architectures and modern API-first applications.
 
+### Rate-Limited API Integration
+Manage API rate limits and avoid throttling by using AsyncRestClient for background processing.
+
 ## Quick Start
 
 ### 1. Extensible API Clients (Recommended)
