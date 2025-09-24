@@ -4,8 +4,8 @@
       "path": "force-app",
       "default": true,
       "package": "RestClientLib",
-      "versionName": "ver 1.0.6",
-      "versionNumber": "1.0.6.NEXT"
+      "versionName": "ver 1.0.7",
+      "versionNumber": "1.0.7.NEXT"
     }
   ],
   "name": "RestClientLib",
@@ -16,6 +16,7 @@
     "RestClientLib": "0HoQm00000001YnKAI",
     "RestClientLib@1.0.4-1": "04tQm000002z5mPIAQ",
     "RestClientLib@1.0.5-1": "04tQm000002z8fRIAQ",
-    "RestClientLib@1.0.6-1": "04tQm000002z8qjIAA"
+    "RestClientLib@1.0.6-1": "04tQm000002z8qjIAA",
+    "RestClientLib@1.0.7-3": "04tQm000002zANtIAM"
   }
 }
