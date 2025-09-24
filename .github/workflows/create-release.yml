@@ -143,6 +143,25 @@ jobs:
       run: |
         sf project convert source --root-dir force-app --output-dir mdapi_out
     
+    - name: Run tests and check code coverage
+      run: |
+        # Run tests with JSON output for parsing
+        TEST_RESULT=$(sf apex test run --test-level RunLocalTests --target-org pkgorg --result-format json --code-coverage --wait 10)
+        echo "$TEST_RESULT" | jq '.'
+        
+        # Extract coverage percentage
+        COVERAGE=$(echo "$TEST_RESULT" | jq -r '.result.coverage.coverage[].percent')
+        echo "Code coverage: $COVERAGE%"
+        
+        # Check if coverage meets minimum requirement (75%)
+        MIN_COVERAGE=75
+        if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
+          echo "ERROR: Code coverage $COVERAGE% is below minimum requirement of $MIN_COVERAGE%"
+          exit 1
+        else
+          echo "SUCCESS: Code coverage $COVERAGE% meets minimum requirement of $MIN_COVERAGE%"
+        fi
+
     - name: Deploy to packaging org
       run: |
         sf project deploy start --metadata-dir mdapi_out --target-org pkgorg --wait 60 --ignore-conflicts
