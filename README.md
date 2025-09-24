@@ -4,7 +4,19 @@ A comprehensive Salesforce Apex library that provides a clean, type-safe, and ex
 
 ## Latest Release
 <!--LATEST-RELEASE-START-->
-_No release yet_
+<!--LATEST-RELEASE-START-->
+**Version:** 1.0.3  
+**Tag:** v1.0.3  
+**Package:** [REST-API-Library-v1.0.3.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.3/REST-API-Library-v1.0.3.zip)  
+**Release Date:** 2025-09-24  
+
+<details><summary>Change summary</summary>
+
+### Changes
+- fix: integrate release creation directly into build workflow (648c091) — Andy Haas
+[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.2...v1.0.3)
+</details>
+<!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-END-->
 
 ## What RestClientLib Does
