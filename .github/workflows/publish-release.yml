@@ -64,11 +64,11 @@ jobs:
           /<!--LATEST-RELEASE-START-->/ {print; system("cat latest_block.md"); printing=0; next}
           /<!--LATEST-RELEASE-END-->/ {print; printing=1; next}
           printing==1 {print}
-        ' README.md > README.new
+        ' README.md > README.md.new
 
-        mv README.new README.md
+        mv README.md.new README.md
         rm latest_block.md
-        echo "Updated README with latest release information"
+        echo "Updated README.md with latest release information"
 
     - name: Commit README update
       env:
