@@ -239,7 +239,11 @@ public with sharing class RestLibApiCall {
 	 */
 	public RestLibApiCall withQuery(String query) {
 		this.queryValue = query;
-		this.encodedQueryValue = EncodingUtil.urlEncode(query, 'UTF-8');
+		if (String.isNotBlank(query)) {
+			this.encodedQueryValue = EncodingUtil.urlEncode(query, 'UTF-8');
+		} else {
+			this.encodedQueryValue = null;
+		}
 		return this;
 	}
 
@@ -344,6 +348,9 @@ public with sharing class RestLibApiCall {
 	 */
 	@TestVisible
 	private static String ensureStringEndsInSlash(String resource) {
+		if (String.isBlank(resource)) {
+			return '/';
+		}
 		if (resource.endsWith('/')) {
 			return resource;
 		}
