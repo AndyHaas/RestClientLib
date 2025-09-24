@@ -189,6 +189,29 @@ System.enqueueJob(new AsyncRestClient(
 | `DEL` | HTTP DELETE method |
 | `HEAD` | HTTP HEAD method |
 
+## Method Reference
+
+### When to Use Each Approach
+
+| Method | Use Case | Benefits | Example |
+|--------|----------|----------|---------|
+| **Extend RestClientLib** | Reusable API clients for specific services | Type-safe, locked to Named Credential, easy to test | `SlackApiClient`, `StripeApiClient` |
+| **RestClient.makeApiCall()** | One-off API calls, quick prototypes | No class creation needed, simple static calls | Webhooks, notifications, simple integrations |
+| **RestLibApiCall fluent API** | Complex API calls with custom headers/timeouts | Chainable methods, readable code, flexible | Custom authentication, complex payloads |
+| **AsyncRestClient** | High-volume operations, non-blocking calls | Avoids governor limits, background processing | Bulk data sync, non-critical notifications |
+| **HttpCalloutMockFactory** | Unit testing API integrations | Easy mocking, multiple response scenarios | Test success/error cases, edge conditions |
+
+### Method Comparison
+
+| Feature | RestClientLib | RestClient | RestLibApiCall | AsyncRestClient |
+|---------|---------------|------------|----------------|-----------------|
+| **Named Credential** | Required in constructor | Required per call | Required per call | Required in constructor |
+| **Type Safety** | High (protected methods) | Medium (static methods) | High (fluent API) | High (constructor) |
+| **Reusability** | High (extend once) | Low (per call) | Medium (reuse instances) | High (queue multiple) |
+| **Testing** | Easy (mock once) | Easy (mock per call) | Easy (mock per call) | Medium (test finalizer) |
+| **Governor Limits** | Subject to callout limits | Subject to callout limits | Subject to callout limits | Avoids callout limits |
+| **Complexity** | Low (simple methods) | Low (static calls) | Medium (fluent chaining) | Medium (finalizer pattern) |
+
 ## Testing
 
 RestClientLib includes comprehensive testing utilities through the `HttpCalloutMockFactory` class:
