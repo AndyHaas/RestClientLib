@@ -3,77 +3,8 @@
 A comprehensive Salesforce Apex library that provides a clean, type-safe, and extensible framework for making REST API callouts. Built with enterprise security and developer productivity in mind, RestClientLib eliminates the complexity of HTTP callouts while providing powerful features like async processing, comprehensive testing utilities, and fluent API design.
 
 ## Latest Release
+## Latest Release
 <!--LATEST-RELEASE-START-->
-<!--LATEST-RELEASE-START-->
-**Version:** 1.0.4  
-**Tag:** v1.0.4  
-**Release Type:** stable  
-**Package Version ID:** 04tQm000002z5mPIAQ  
-**Package:** [REST-API-Library-v1.0.4.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.4/REST-API-Library-v1.0.4.zip)  
-**Release Date:** 2025-09-24  
-
-### 🚀 Quick Install
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ) - Install in production org
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ) - Install in sandbox org
-- **CLI:** `sf package install --package 04tQm000002z5mPIAQ --wait 10 --installation-key-bypass`
-
-<details><summary>Change summary</summary>
-
-**Package Version ID:** 04tQm000002z5mPIAQ
-
-### Installation
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ)
-- **CLI:** `sf package install --package 04tQm000002z5mPIAQ --wait 10 --installation-key-bypass`
-
-### Changes
-- feat: update package alias with actual package ID (e6cde64) — Andy Haas
-- fix: remove invalid variables permission (8e2e7e9) — Andy Haas
-- fix: add variables write permission and improve package version creation (e5db917) — Andy Haas
-- feat: add comprehensive debugging and fix package creation command (e41b69b) — Andy Haas
-- feat: add automatic package creation and use unlocked packages (ee8ada2) — Andy Haas
-- fix: use vars instead of secrets for SF_PACKAGE1_ID (bdd6226) — Andy Haas
-- feat: add release types (stable/beta) and streamline workflows (d372165) — Andy Haas
-- docs: update README for v1.0.3 (265a33a) — github-actions
-[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.3...v1.0.4)
-</details>
-<!--LATEST-RELEASE-END-->
-<!--LATEST-RELEASE-START-->
-<!--LATEST-RELEASE-START-->
-**Version:** 1.0.4  
-**Tag:** v1.0.4  
-**Release Type:** stable  
-**Package Version ID:** 04tQm000002z5mPIAQ  
-**Package:** [REST-API-Library-v1.0.4.zip](https://github.com/AndyHaas/RestClientLib/releases/download/v1.0.4/REST-API-Library-v1.0.4.zip)  
-**Release Date:** 2025-09-24  
-
-### 🚀 Quick Install
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ) - Install in production org
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ) - Install in sandbox org
-- **CLI:** `sf package install --package 04tQm000002z5mPIAQ --wait 10 --installation-key-bypass`
-
-<details><summary>Change summary</summary>
-
-**Package Version ID:** 04tQm000002z5mPIAQ
-
-### Installation
-- **Production:** [https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ)
-- **Sandbox:** [https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tQm000002z5mPIAQ)
-- **CLI:** `sf package install --package 04tQm000002z5mPIAQ --wait 10 --installation-key-bypass`
-
-### Changes
-- feat: update package alias with actual package ID (e6cde64) — Andy Haas
-- fix: remove invalid variables permission (8e2e7e9) — Andy Haas
-- fix: add variables write permission and improve package version creation (e5db917) — Andy Haas
-- feat: add comprehensive debugging and fix package creation command (e41b69b) — Andy Haas
-- feat: add automatic package creation and use unlocked packages (ee8ada2) — Andy Haas
-- fix: use vars instead of secrets for SF_PACKAGE1_ID (bdd6226) — Andy Haas
-- feat: add release types (stable/beta) and streamline workflows (d372165) — Andy Haas
-- docs: update README for v1.0.3 (265a33a) — github-actions
-[Compare changes](https://github.com/AndyHaas/RestClientLib/compare/v1.0.3...v1.0.4)
-</details>
-<!--LATEST-RELEASE-END-->
-<!--LATEST-RELEASE-END-->
 <!--LATEST-RELEASE-END-->
 
 ## What RestClientLib Does
