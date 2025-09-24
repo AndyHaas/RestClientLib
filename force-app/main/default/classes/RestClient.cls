@@ -34,4 +34,22 @@ public virtual class RestClient extends RestLib {
 	) {
 		return new RestClient(namedCredential).makeApiCall(apiCall);
 	}
+
+	/**
+	 * @description A static wrapper for the main makeApiCall method with logging context
+	 *
+	 * @param namedCredential The named credential to use
+	 * @param apiCall HTTPVerb enum value. See Enum above
+	 * @param relatedRecord The SObject record to associate with the API call for logging purposes
+	 *
+	 * @return `HTTPResponse`
+	 */
+	@SuppressWarnings('PMD.ExcessiveParameterList')
+	public static HttpResponse makeApiCall(
+		String namedCredential,
+		RestLibApiCall apiCall,
+		SObject relatedRecord
+	) {
+		return new RestClient(namedCredential).makeApiCall(apiCall, relatedRecord);
+	}
 }

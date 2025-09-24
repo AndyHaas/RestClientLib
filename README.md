@@ -40,6 +40,7 @@ Queue API calls for asynchronous execution to avoid governor limits. Essential f
 - **Automatic Headers**: Default JSON headers with custom header support
 - **URL Encoding**: Automatic query parameter encoding
 - **PATCH Support**: Handles PATCH requests via POST with `_HttpMethod=PATCH` parameter
+- **Enhanced Logging**: Optional Nebula integration with System.debug fallback for comprehensive API call logging
 
 ## Common Use Cases
 
@@ -60,6 +61,43 @@ Integrate with microservices architectures and modern API-first applications.
 
 ### Rate-Limited API Integration
 Manage API rate limits and avoid throttling by using AsyncRestClient for background processing.
+
+## Enhanced Logging with NebulaAdapter
+
+RestClientLib includes optional integration with the Nebula logging framework for comprehensive API call logging. The `NebulaAdapter` provides structured logging when Nebula is available, with graceful fallback to System.debug when it's not.
+
+### Features
+
+- **Automatic Request/Response Logging**: Logs HTTP method, endpoint, headers, body, and response details
+- **Record Association**: Links API calls to specific SObject records for easy traceability
+- **Graceful Degradation**: Works with or without Nebula installed
+- **Zero Dependencies**: No compilation dependencies on external packages
+- **Structured Logging**: Rich, queryable logs when using Nebula
+- **Fallback Logging**: System.debug output when Nebula isn't available
+
+### Usage
+
+```apex
+// Enhanced logging with record context
+HttpResponse response = restLib.get('/api/users', accountRecord);
+HttpResponse response = RestClient.makeApiCall('MyAPI', apiCall, accountRecord);
+
+// Async calls with logging
+System.enqueueJob(new AsyncRestClient('MyAPI', apiCall, MyFinalizer.class, accountRecord));
+
+// Direct NebulaAdapter usage
+NebulaAdapter.info('API call completed', accountRecord);
+NebulaAdapter.logHttpRequest('Request details', httpRequest, headersToLog, accountRecord);
+NebulaAdapter.logHttpResponse('Response details', httpResponse, accountRecord);
+```
+
+### Logging Levels
+
+- **`info()`** - General information logging
+- **`debug()`** - Detailed debugging information
+- **`error()`** - Error logging with exception details
+- **`logHttpRequest()`** - HTTP request logging with customizable headers
+- **`logHttpResponse()`** - HTTP response logging with status and body
 
 ## Quick Start
 
@@ -168,23 +206,37 @@ System.enqueueJob(new AsyncRestClient(
 |--------|-------------|------------|
 | `get(String path)` | GET request to specified path | `path` - API endpoint path |
 | `get(String path, String query)` | GET request with query parameters | `path` - API endpoint path, `query` - Query string |
+| `get(String path, SObject relatedRecord)` | GET request with logging context | `path` - API endpoint path, `relatedRecord` - Record for logging |
+| `get(String path, String query, SObject relatedRecord)` | GET request with query and logging context | `path` - API endpoint path, `query` - Query string, `relatedRecord` - Record for logging |
 | `post(String path, String body)` | POST request with body | `path` - API endpoint path, `body` - Request body |
 | `post(String path, String query, String body)` | POST request with query and body | `path` - API endpoint path, `query` - Query string, `body` - Request body |
+| `post(String path, String body, SObject relatedRecord)` | POST request with body and logging context | `path` - API endpoint path, `body` - Request body, `relatedRecord` - Record for logging |
+| `post(String path, String query, String body, SObject relatedRecord)` | POST request with query, body, and logging context | `path` - API endpoint path, `query` - Query string, `body` - Request body, `relatedRecord` - Record for logging |
 | `put(String path, String body)` | PUT request with body | `path` - API endpoint path, `body` - Request body |
 | `put(String path, String query, String body)` | PUT request with query and body | `path` - API endpoint path, `query` - Query string, `body` - Request body |
+| `put(String path, String body, SObject relatedRecord)` | PUT request with body and logging context | `path` - API endpoint path, `body` - Request body, `relatedRecord` - Record for logging |
+| `put(String path, String query, String body, SObject relatedRecord)` | PUT request with query, body, and logging context | `path` - API endpoint path, `query` - Query string, `body` - Request body, `relatedRecord` - Record for logging |
 | `patch(String path, String body)` | PATCH request with body | `path` - API endpoint path, `body` - Request body |
 | `patch(String path, String query, String body)` | PATCH request with query and body | `path` - API endpoint path, `query` - Query string, `body` - Request body |
+| `patch(String path, String body, SObject relatedRecord)` | PATCH request with body and logging context | `path` - API endpoint path, `body` - Request body, `relatedRecord` - Record for logging |
+| `patch(String path, String query, String body, SObject relatedRecord)` | PATCH request with query, body, and logging context | `path` - API endpoint path, `query` - Query string, `body` - Request body, `relatedRecord` - Record for logging |
 | `del(String path)` | DELETE request | `path` - API endpoint path |
 | `del(String path, String query)` | DELETE request with query parameters | `path` - API endpoint path, `query` - Query string |
+| `del(String path, SObject relatedRecord)` | DELETE request with logging context | `path` - API endpoint path, `relatedRecord` - Record for logging |
+| `del(String path, String query, SObject relatedRecord)` | DELETE request with query and logging context | `path` - API endpoint path, `query` - Query string, `relatedRecord` - Record for logging |
 | `makeApiCall(HttpVerb method, String path)` | Generic API call with method and path | `method` - HTTP verb, `path` - API endpoint path |
 | `makeApiCall(HttpVerb method, String path, String query)` | Generic API call with method, path, and query | `method` - HTTP verb, `path` - API endpoint path, `query` - Query string |
 | `makeApiCall(HttpVerb method, String path, String query, String body)` | Generic API call with all parameters | `method` - HTTP verb, `path` - API endpoint path, `query` - Query string, `body` - Request body |
+| `makeApiCall(HttpVerb method, String path, SObject relatedRecord)` | Generic API call with method, path, and logging context | `method` - HTTP verb, `path` - API endpoint path, `relatedRecord` - Record for logging |
+| `makeApiCall(HttpVerb method, String path, String query, SObject relatedRecord)` | Generic API call with method, path, query, and logging context | `method` - HTTP verb, `path` - API endpoint path, `query` - Query string, `relatedRecord` - Record for logging |
+| `makeApiCall(HttpVerb method, String path, String query, String body, SObject relatedRecord)` | Generic API call with all parameters and logging context | `method` - HTTP verb, `path` - API endpoint path, `query` - Query string, `body` - Request body, `relatedRecord` - Record for logging |
 
 ### RestClient Static Methods
 
 | Method | Description | Parameters |
 |--------|-------------|------------|
 | `makeApiCall(String namedCredential, RestLibApiCall apiCall)` | Make a REST callout | `namedCredential` - Named Credential name, `apiCall` - API call configuration |
+| `makeApiCall(String namedCredential, RestLibApiCall apiCall, SObject relatedRecord)` | Make a REST callout with logging context | `namedCredential` - Named Credential name, `apiCall` - API call configuration, `relatedRecord` - Record for logging |
 
 ### RestLibApiCall Fluent API
 
@@ -211,6 +263,18 @@ System.enqueueJob(new AsyncRestClient(
 |-------------|-------------|------------|
 | `RestLibApiCall(HttpVerb method, String path, String query, String body)` | Basic constructor with default headers | `method` - HTTP verb, `path` - API path, `query` - Query string, `body` - Request body |
 | `RestLibApiCall(HttpVerb method, String path, String query, String body, Map<String,String> headers)` | Full constructor with custom headers | `method` - HTTP verb, `path` - API path, `query` - Query string, `body` - Request body, `headers` - Custom headers |
+
+### NebulaAdapter Methods
+
+| Method | Description | Parameters |
+|--------|-------------|------------|
+| `isAvailable()` | Check if Nebula is installed and available | None |
+| `info(String message, SObject record)` | Log info message with record context | `message` - Log message, `record` - Associated SObject record |
+| `debug(String message, SObject record)` | Log debug message with record context | `message` - Log message, `record` - Associated SObject record |
+| `error(String message, SObject record, Exception ex)` | Log error message with record and exception context | `message` - Log message, `record` - Associated SObject record, `ex` - Exception details |
+| `logHttpRequest(String title, HttpRequest req, List<String> headersToLog, SObject record)` | Log HTTP request details | `title` - Log title, `req` - HttpRequest object, `headersToLog` - Headers to include, `record` - Associated SObject record |
+| `logHttpResponse(String title, HttpResponse res, SObject record)` | Log HTTP response details | `title` - Log title, `res` - HttpResponse object, `record` - Associated SObject record |
+| `save()` | Persist accumulated log entries | None |
 
 ### HttpVerb Enum
 
@@ -343,8 +407,10 @@ sf project deploy start --source-dir force-app
 - **HttpVerb** - Type-safe enum for HTTP methods
 - **AsyncRestClient** - Queueable implementation for async processing
 - **AsyncRestLibFinalizer** - Abstract class for handling async responses
+- **NebulaAdapter** - Optional logging integration with Nebula framework
 - **HttpCalloutMockFactory** - Comprehensive testing utilities
 - **RestLibTests** - Complete test suite
+- **NebulaAdapter_Test** - Test suite for NebulaAdapter functionality
 
 ### Package Details
 
@@ -362,6 +428,7 @@ RestClientLib follows a layered architecture:
 3. **RestClientLib** - Extensible layer for dedicated API clients
 4. **RestLibApiCall** - Fluent API builder for complex scenarios
 5. **AsyncRestClient** - Queueable layer for background processing
+6. **NebulaAdapter** - Optional logging layer with Nebula integration and System.debug fallback
 
 ### Support
 
