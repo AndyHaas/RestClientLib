@@ -4,8 +4,8 @@
       "path": "force-app",
       "default": true,
       "package": "RestClientLib",
-      "versionName": "ver 0.1",
-      "versionNumber": "0.1.0.NEXT"
+      "versionName": "ver 1.0.1",
+      "versionNumber": "1.0.1.NEXT"
     }
   ],
   "name": "RestClientLib",

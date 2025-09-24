@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 PACKAGE_NAME="REST API Library"
 PACKAGE_DESCRIPTION="A comprehensive Salesforce Apex library for making REST API callouts with ease, security, and reliability. This package provides a robust foundation for building REST integrations in Salesforce with built-in support for Named Credentials, async processing, and comprehensive testing utilities."
-PACKAGE_VERSION="1"
+PACKAGE_VERSION="1.0.1"
 API_VERSION="64.0"
 
 # Get the directory where the script is located
